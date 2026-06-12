@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'ui/MainWindow.ui'
+# Form implementation generated from reading ui file 'ui/main_window.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.11
 #
@@ -10,60 +10,59 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-
 class UiMainWindow(object):
-    def setupUi(self, MainWindow):
-        MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(800, 600)
-        self.centralwidget = QtWidgets.QWidget(MainWindow)
+    def setup_ui(self, main_window):
+        main_window.setObjectName("main_window")
+        main_window.resize(800, 600)
+        self.centralwidget = QtWidgets.QWidget(main_window)
         self.centralwidget.setObjectName("centralwidget")
-        self.lineEdit = QtWidgets.QLineEdit(self.centralwidget)
-        self.lineEdit.setGeometry(QtCore.QRect(30, 20, 591, 21))
-        self.lineEdit.setObjectName("lineEdit")
-        self.toolButton = QtWidgets.QToolButton(self.centralwidget)
-        self.toolButton.setGeometry(QtCore.QRect(650, 20, 26, 22))
-        self.toolButton.setObjectName("toolButton")
-        self.tableWidget = QtWidgets.QTableWidget(self.centralwidget)
-        self.tableWidget.setGeometry(QtCore.QRect(30, 60, 591, 441))
-        self.tableWidget.setObjectName("tableWidget")
-        self.tableWidget.setColumnCount(0)
-        self.tableWidget.setRowCount(0)
-        self.pushButton = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton.setGeometry(QtCore.QRect(650, 70, 113, 32))
-        self.pushButton.setObjectName("pushButton")
-        self.pushButton_2 = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton_2.setGeometry(QtCore.QRect(650, 110, 113, 32))
-        self.pushButton_2.setObjectName("pushButton_2")
-        self.pushButton_3 = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton_3.setGeometry(QtCore.QRect(650, 150, 113, 32))
-        self.pushButton_3.setObjectName("pushButton_3")
-        self.pushButton_4 = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton_4.setGeometry(QtCore.QRect(650, 190, 113, 32))
-        self.pushButton_4.setObjectName("pushButton_4")
-        self.pushButton_5 = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton_5.setGeometry(QtCore.QRect(650, 230, 113, 32))
-        self.pushButton_5.setObjectName("pushButton_5")
-        MainWindow.setCentralWidget(self.centralwidget)
-        self.menubar = QtWidgets.QMenuBar(MainWindow)
+        self.line_edit = QtWidgets.QLineEdit(self.centralwidget)
+        self.line_edit.setGeometry(QtCore.QRect(30, 20, 591, 21))
+        self.line_edit.setObjectName("line_edit")
+        self.tool_btn = QtWidgets.QToolButton(self.centralwidget)
+        self.tool_btn.setGeometry(QtCore.QRect(650, 20, 26, 22))
+        self.tool_btn.setObjectName("tool_btn")
+        self.table_widget = QtWidgets.QTableWidget(self.centralwidget)
+        self.table_widget.setGeometry(QtCore.QRect(30, 60, 591, 441))
+        self.table_widget.setObjectName("table_widget")
+        self.table_widget.setColumnCount(0)
+        self.table_widget.setRowCount(0)
+        self.create_btn = QtWidgets.QPushButton(self.centralwidget)
+        self.create_btn.setGeometry(QtCore.QRect(650, 70, 113, 32))
+        self.create_btn.setObjectName("create_btn")
+        self.delete_btn = QtWidgets.QPushButton(self.centralwidget)
+        self.delete_btn.setGeometry(QtCore.QRect(650, 110, 113, 32))
+        self.delete_btn.setObjectName("delete_btn")
+        self.edit_btn = QtWidgets.QPushButton(self.centralwidget)
+        self.edit_btn.setGeometry(QtCore.QRect(650, 150, 113, 32))
+        self.edit_btn.setObjectName("edit_btn")
+        self.execute_btn = QtWidgets.QPushButton(self.centralwidget)
+        self.execute_btn.setGeometry(QtCore.QRect(650, 190, 113, 32))
+        self.execute_btn.setObjectName("execute_btn")
+        self.executeall_btn = QtWidgets.QPushButton(self.centralwidget)
+        self.executeall_btn.setGeometry(QtCore.QRect(650, 230, 113, 32))
+        self.executeall_btn.setObjectName("executeall_btn")
+        main_window.setCentralWidget(self.centralwidget)
+        self.menubar = QtWidgets.QMenuBar(main_window)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
         self.menubar.setObjectName("menubar")
-        MainWindow.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(MainWindow)
+        main_window.setMenuBar(self.menubar)
+        self.statusbar = QtWidgets.QStatusBar(main_window)
         self.statusbar.setObjectName("statusbar")
-        MainWindow.setStatusBar(self.statusbar)
+        main_window.setStatusBar(self.statusbar)
 
-        self.retranslateUi(MainWindow)
-        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        self.retranslate_ui(main_window)
+        QtCore.QMetaObject.connectSlotsByName(main_window)
 
-    def retranslateUi(self, MainWindow):
+    def retranslate_ui(self, main_window):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.toolButton.setText(_translate("MainWindow", "..."))
-        self.pushButton.setText(_translate("MainWindow", "Create"))
-        self.pushButton_2.setText(_translate("MainWindow", "Delete"))
-        self.pushButton_3.setText(_translate("MainWindow", "Edit"))
-        self.pushButton_4.setText(_translate("MainWindow", "Execute"))
-        self.pushButton_5.setText(_translate("MainWindow", "Execute all"))
+        main_window.setWindowTitle(_translate("main_window", "main_window"))
+        self.tool_btn.setText(_translate("main_window", "..."))
+        self.create_btn.setText(_translate("main_window", "Create"))
+        self.delete_btn.setText(_translate("main_window", "Delete"))
+        self.edit_btn.setText(_translate("main_window", "Edit"))
+        self.execute_btn.setText(_translate("main_window", "Execute"))
+        self.executeall_btn.setText(_translate("main_window", "Execute all"))
 
 
 

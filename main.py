@@ -4,10 +4,10 @@ from main_window import UiMainWindow
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
+    main_window = QtWidgets.QMainWindow()
     ui = UiMainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
+    ui.setup_ui(main_window)
+    main_window.show()
     sys.exit(app.exec_())
 
 if __name__ == "__main__":
