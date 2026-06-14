@@ -1,48 +1,42 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets
 
-class UiCreateWindow(object):
-    def setup_ui(self, main_window):
+class CreateWindow(QtWidgets.QWidget):
+    def __init__(self):
+        super().__init__()
         # general window settings
-        main_window.setObjectName("main_window")
-        main_window.resize(800, 600)
+        self.setObjectName("create_window")
+        self.resize(800, 600)
 
-        self.centralwidget = QtWidgets.QWidget(main_window)
+        self.centralwidget = QtWidgets.QWidget(self)
         self.centralwidget.setObjectName("centralwidget")
 
         # statusbar
-        self.statusbar = QtWidgets.QStatusBar(main_window)
-        self.statusbar.setObjectName("statusbar")
-        
         self.save_btn = QtWidgets.QPushButton(self.centralwidget)
         self.save_btn.setGeometry(QtCore.QRect(600, 520, 81, 26))
         self.save_btn.setObjectName("save_btn")
+        self.save_btn.clicked.connect(self.save_entry)
 
         self.cancel_btn = QtWidgets.QPushButton(self.centralwidget)
         self.cancel_btn.setGeometry(QtCore.QRect(700, 520, 81, 26))
         self.cancel_btn.setObjectName("cancel_btn")
-
-        self.statusbar.addPermanentWidget(self.save_btn)
-        self.statusbar.addPermanentWidget(self.cancel_btn)
-        
-        main_window.setStatusBar(self.statusbar)
-        main_window.setCentralWidget(self.centralwidget)
+        self.cancel_btn.clicked.connect(self.close_window)
 
         # name, description and type input fields with their labels
         self.name_label = QtWidgets.QLabel(self.centralwidget)
         self.name_label.setGeometry(QtCore.QRect(20, 20, 60, 16))
         self.name_label.setObjectName("name_label")
 
-        self.lineEdit = QtWidgets.QLineEdit(self.centralwidget)
-        self.lineEdit.setGeometry(QtCore.QRect(130, 20, 481, 22))
-        self.lineEdit.setObjectName("lineEdit")
+        self.name_input = QtWidgets.QLineEdit(self.centralwidget)
+        self.name_input.setGeometry(QtCore.QRect(130, 20, 481, 22))
+        self.name_input.setObjectName("name_input")
 
         self.desc_label = QtWidgets.QLabel(self.centralwidget)
         self.desc_label.setGeometry(QtCore.QRect(20, 80, 81, 16))
         self.desc_label.setObjectName("desc_label")
 
-        self.textEdit = QtWidgets.QTextEdit(self.centralwidget)
-        self.textEdit.setGeometry(QtCore.QRect(130, 60, 481, 64))
-        self.textEdit.setObjectName("textEdit")
+        self.desc_input = QtWidgets.QTextEdit(self.centralwidget)
+        self.desc_input.setGeometry(QtCore.QRect(130, 60, 481, 64))
+        self.desc_input.setObjectName("desc_input")
 
         self.type_label = QtWidgets.QLabel(self.centralwidget)
         self.type_label.setGeometry(QtCore.QRect(20, 150, 60, 16))
@@ -190,45 +184,51 @@ class UiCreateWindow(object):
         self.add_btn.setGeometry(QtCore.QRect(660, 70, 81, 26))
         self.add_btn.setObjectName("add_btn")
 
-        self.retranslate_ui(main_window)
-        QtCore.QMetaObject.connectSlotsByName(main_window)
+        self.retranslate_ui()
+        #QtCore.QMetaObject.connectSlotsByName(self)
 
-    def retranslate_ui(self, main_window):
+    def retranslate_ui(self):
         _translate = QtCore.QCoreApplication.translate
-        main_window.setWindowTitle(_translate("main_window", "create"))
+        self.setWindowTitle(_translate("create_window", "create"))
 
         # labels
-        self.name_label.setText(_translate("main_window", "Name"))
-        self.desc_label.setText(_translate("main_window", "Description"))
-        self.repeat_label.setText(_translate("main_window", "Repeat every"))
-        self.type_label.setText(_translate("main_window", "Type"))
-        self.time_label.setText(_translate("main_window", "Time"))
-        self.day_month_label.setText(_translate("main_window", "Day of month"))
-        self.origin_label.setText(_translate("main_window", "Originpath"))
-        self.include_dir_label.setText(_translate("main_window", "Include directories?"))
-        self.dest_label.setText(_translate("main_window", "Destinationpath"))
+        self.name_label.setText(_translate("create_window", "Name"))
+        self.desc_label.setText(_translate("create_window", "Description"))
+        self.repeat_label.setText(_translate("create_window", "Repeat every"))
+        self.type_label.setText(_translate("create_window", "Type"))
+        self.time_label.setText(_translate("create_window", "Time"))
+        self.day_month_label.setText(_translate("create_window", "Day of month"))
+        self.origin_label.setText(_translate("create_window", "Originpath"))
+        self.include_dir_label.setText(_translate("create_window", "Include directories?"))
+        self.dest_label.setText(_translate("create_window", "Destinationpath"))
 
         # buttons
-        self.save_btn.setText(_translate("main_window", "save"))
-        self.cancel_btn.setText(_translate("main_window", "cancel"))
-        self.origin_tool_btn.setText(_translate("main_window", "..."))
-        self.dest_tool_btn.setText(_translate("main_window", "..."))
-        self.add_btn.setText(_translate("main_window", "Add"))
+        self.save_btn.setText(_translate("create_window", "save"))
+        self.cancel_btn.setText(_translate("create_window", "cancel"))
+        self.origin_tool_btn.setText(_translate("create_window", "..."))
+        self.dest_tool_btn.setText(_translate("create_window", "..."))
+        self.add_btn.setText(_translate("create_window", "Add"))
 
         # tabs
-        self.tab_bar.setTabText(self.tab_bar.indexOf(self.dir_tab), _translate("main_window", "Directory"))
-        self.tab_bar.setTabText(self.tab_bar.indexOf(self.files_tab), _translate("main_window", "Files"))
+        self.tab_bar.setTabText(self.tab_bar.indexOf(self.dir_tab), _translate("create_window", "Directory"))
+        self.tab_bar.setTabText(self.tab_bar.indexOf(self.files_tab), _translate("create_window", "Files"))
 
         # radio buttons
-        self.main_interval_radio.setText(_translate("main_window", "Interval"))
-        self.main_datetime_radio.setText(_translate("main_window", "Date/Time"))
-        self.main_newest_radio.setText(_translate("main_window", "Newest"))
-        self.dir_none_radio.setText(_translate("main_window", "None"))
-        self.dir_empty_radio.setText(_translate("main_window", "Empty"))
-        self.dir_filled_radio.setText(_translate("main_window", "Filled"))
-        self.dir_all_radio.setText(_translate("main_window", "All"))
-        self.files_none_radio.setText(_translate("main_window", "None"))
-        self.files_selected_radio.setText(_translate("main_window", "Selected types"))
-        self.files_exclude_radio.setText(_translate("main_window", "Exclude types"))
-        self.files_all_radio.setText(_translate("main_window", "All"))
+        self.main_interval_radio.setText(_translate("create_window", "Interval"))
+        self.main_datetime_radio.setText(_translate("create_window", "Date/Time"))
+        self.main_newest_radio.setText(_translate("create_window", "Newest"))
+        self.dir_none_radio.setText(_translate("create_window", "None"))
+        self.dir_empty_radio.setText(_translate("create_window", "Empty"))
+        self.dir_filled_radio.setText(_translate("create_window", "Filled"))
+        self.dir_all_radio.setText(_translate("create_window", "All"))
+        self.files_none_radio.setText(_translate("create_window", "None"))
+        self.files_selected_radio.setText(_translate("create_window", "Selected types"))
+        self.files_exclude_radio.setText(_translate("create_window", "Exclude types"))
+        self.files_all_radio.setText(_translate("create_window", "All"))
 
+    def close_window(self):
+        self.close()
+
+    def save_entry(self):
+
+        self.close_window()

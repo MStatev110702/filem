@@ -1,27 +1,30 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets
+from create_window import CreateWindow
 
-class UiMainWindow(object):
-    def setup_ui(self, main_window):
+class MainWindow(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+
         # general window settings
-        main_window.setObjectName("main_window")
-        main_window.resize(800, 600)
+        self.setObjectName("main_window")
+        self.resize(800, 600)
 
-        self.centralwidget = QtWidgets.QWidget(main_window)
+        self.centralwidget = QtWidgets.QWidget(self)
         self.centralwidget.setObjectName("centralwidget")
-        main_window.setCentralWidget(self.centralwidget)
 
         # menubar
-        self.menubar = QtWidgets.QMenuBar(main_window)
+        self.menubar = QtWidgets.QMenuBar(self)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
         self.menubar.setObjectName("menubar")
-        
-        main_window.setMenuBar(self.menubar)
+
 
         # statusbar
-        self.statusbar = QtWidgets.QStatusBar(main_window)
+        self.statusbar = QtWidgets.QStatusBar(self)
         self.statusbar.setObjectName("statusbar")
 
-        main_window.setStatusBar(self.statusbar)
+        self.setCentralWidget(self.centralwidget)
+        self.setMenuBar(self.menubar)
+        self.setStatusBar(self.statusbar)
 
         # search input
         self.search_input = QtWidgets.QLineEdit(self.centralwidget)
@@ -43,6 +46,7 @@ class UiMainWindow(object):
         self.create_btn = QtWidgets.QPushButton(self.centralwidget)
         self.create_btn.setGeometry(QtCore.QRect(650, 70, 113, 32))
         self.create_btn.setObjectName("create_btn")
+        self.create_btn.clicked.connect(self.open_create_window)
 
         self.delete_btn = QtWidgets.QPushButton(self.centralwidget)
         self.delete_btn.setGeometry(QtCore.QRect(650, 110, 113, 32))
@@ -60,20 +64,21 @@ class UiMainWindow(object):
         self.start_all_btn.setGeometry(QtCore.QRect(650, 230, 113, 32))
         self.start_all_btn.setObjectName("start_all_btn")
 
-        self.retranslate_ui(main_window)
-        QtCore.QMetaObject.connectSlotsByName(main_window)
+        self.retranslate_ui()
+        #QtCore.QMetaObject.connectSlotsByName(self)
 
-    def retranslate_ui(self, main_window):
+    def retranslate_ui(self):
         _translate = QtCore.QCoreApplication.translate
-        main_window.setWindowTitle(_translate("main_window", "main_window"))
+        self.setWindowTitle(_translate("MainWindow", "Main Window"))
         
         # buttons
-        self.search_btn.setText(_translate("main_window", "..."))
-        self.create_btn.setText(_translate("main_window", "Create"))
-        self.delete_btn.setText(_translate("main_window", "Delete"))
-        self.edit_btn.setText(_translate("main_window", "Edit"))
-        self.start_btn.setText(_translate("main_window", "Start"))
-        self.start_all_btn.setText(_translate("main_window", "Start all"))
+        self.search_btn.setText(_translate("MainWindow", "..."))
+        self.create_btn.setText(_translate("MainWindow", "Create"))
+        self.delete_btn.setText(_translate("MainWindow", "Delete"))
+        self.edit_btn.setText(_translate("MainWindow", "Edit"))
+        self.start_btn.setText(_translate("MainWindow", "Start"))
+        self.start_all_btn.setText(_translate("MainWindow", "Start all"))
 
-
-
+    def open_create_window(self):
+        self.create_w = CreateWindow()
+        self.create_w.show()
