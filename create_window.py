@@ -130,6 +130,7 @@ class CreateWindow(QtWidgets.QWidget):
         self.origin_tool_btn = QtWidgets.QToolButton(self.dir_tab)
         self.origin_tool_btn.setGeometry(QtCore.QRect(570, 11, 19, 18))
         self.origin_tool_btn.setObjectName("origin_tool_btn")
+        self.origin_tool_btn.clicked.connect(self.open_file_explorer)
         
         # destinationpath
         self.dest_label = QtWidgets.QLabel(self.dir_tab)
@@ -143,6 +144,7 @@ class CreateWindow(QtWidgets.QWidget):
         self.dest_tool_btn = QtWidgets.QToolButton(self.dir_tab)
         self.dest_tool_btn.setGeometry(QtCore.QRect(570, 41, 19, 18))
         self.dest_tool_btn.setObjectName("dest_tool_btn")
+        self.dest_tool_btn.clicked.connect(self.open_file_explorer)
 
         # include directory radio buttons
         self.include_dir_label = QtWidgets.QLabel(self.dir_tab)
@@ -301,3 +303,21 @@ class CreateWindow(QtWidgets.QWidget):
         self.day_month_spin.setEnabled(is_date_time_btn)
         self.time_label.setEnabled(is_date_time_btn)
         self.time_edit.setEnabled(is_date_time_btn)
+
+    def open_file_explorer(self):
+        file_dialog = QtWidgets.QFileDialog.getExistingDirectory(
+            parent=self,
+            caption="Select directory",
+            directory="",
+            options=QtWidgets.QFileDialog.Option.DontUseNativeDialog,
+        )
+
+        if file_dialog.strip() == "":
+            return
+
+        button = self.sender()
+        if button == self.origin_tool_btn:
+            self.origin_input.setText(file_dialog)
+        else:
+            self.dest_input.setText(file_dialog)
+
