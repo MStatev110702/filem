@@ -51,60 +51,65 @@ class CreateWindow(QtWidgets.QWidget):
         self.type_combo.currentIndexChanged.connect(self.type_combo_changed)
 
         # radio menu for selecting the start of the script
+        self.main_manual_radio = QtWidgets.QRadioButton(self.centralwidget)
+        self.main_manual_radio.setGeometry(QtCore.QRect(20, 180, 97, 21))
+        self.main_manual_radio.setObjectName("main_manual_radio")
+        self.main_manual_radio.setChecked(True)
+
         self.main_interval_radio = QtWidgets.QRadioButton(self.centralwidget)
-        self.main_interval_radio.setGeometry(QtCore.QRect(20, 190, 97, 21))
+        self.main_interval_radio.setGeometry(QtCore.QRect(140, 180, 97, 21))
         self.main_interval_radio.setObjectName("main_interval_radio")
-        self.main_interval_radio.setChecked(True)
 
         self.main_datetime_radio = QtWidgets.QRadioButton(self.centralwidget)
-        self.main_datetime_radio.setGeometry(QtCore.QRect(20, 230, 97, 21))
+        self.main_datetime_radio.setGeometry(QtCore.QRect(240, 180, 97, 21))
         self.main_datetime_radio.setObjectName("main_datetime_radio")
 
         self.main_newest_radio = QtWidgets.QRadioButton(self.centralwidget)
-        self.main_newest_radio.setGeometry(QtCore.QRect(20, 270, 97, 21))
+        self.main_newest_radio.setGeometry(QtCore.QRect(340, 180, 97, 21))
         self.main_newest_radio.setObjectName("main_newest_radio")
         
         main_radio_group = QtWidgets.QButtonGroup(self.centralwidget)
         main_radio_group.setExclusive(True)
-        main_radio_group.addButton(self.main_interval_radio, 1)
-        main_radio_group.addButton(self.main_datetime_radio, 2)
-        main_radio_group.addButton(self.main_newest_radio, 3)
+        main_radio_group.addButton(self.main_manual_radio, 1)
+        main_radio_group.addButton(self.main_interval_radio, 2)
+        main_radio_group.addButton(self.main_datetime_radio, 3)
+        main_radio_group.addButton(self.main_newest_radio, 4)
         main_radio_group.buttonClicked.connect(self.main_radio_changed)
 
         # interval fields
         self.repeat_label = QtWidgets.QLabel(self.centralwidget)
-        self.repeat_label.setGeometry(QtCore.QRect(130, 190, 91, 16))
+        self.repeat_label.setGeometry(QtCore.QRect(20, 230, 91, 16))
         self.repeat_label.setObjectName("repeat_label")
 
         self.repeat_spin = QtWidgets.QSpinBox(self.centralwidget)
-        self.repeat_spin.setGeometry(QtCore.QRect(230, 190, 42, 22))
+        self.repeat_spin.setGeometry(QtCore.QRect(120, 230, 42, 22))
         self.repeat_spin.setObjectName("repeat_spin")
 
         self.interval_type_combo = QtWidgets.QComboBox(self.centralwidget)
-        self.interval_type_combo.setGeometry(QtCore.QRect(300, 190, 100, 22))
+        self.interval_type_combo.setGeometry(QtCore.QRect(220, 230, 100, 22))
         self.interval_type_combo.setObjectName("interval_type_combo")
         self.load_combo_values(self.interval_type_combo, IntervalTypeComboValues)
 
         # date/time fields
         self.day_month_label = QtWidgets.QLabel(self.centralwidget)
-        self.day_month_label.setGeometry(QtCore.QRect(130, 230, 81, 16))
+        self.day_month_label.setGeometry(QtCore.QRect(20, 230, 81, 16))
         self.day_month_label.setObjectName("day_month_label")
 
         self.day_month_spin = QtWidgets.QSpinBox(self.centralwidget)
-        self.day_month_spin.setGeometry(QtCore.QRect(230, 230, 42, 22))
+        self.day_month_spin.setGeometry(QtCore.QRect(120, 230, 42, 22))
         self.day_month_spin.setObjectName("day_month_spin")
 
         self.time_label = QtWidgets.QLabel(self.centralwidget)
-        self.time_label.setGeometry(QtCore.QRect(310, 230, 60, 16))
+        self.time_label.setGeometry(QtCore.QRect(210, 230, 60, 16))
         self.time_label.setObjectName("time_label")
 
         self.time_edit = QtWidgets.QTimeEdit(self.centralwidget)
-        self.time_edit.setGeometry(QtCore.QRect(370, 230, 118, 22))
+        self.time_edit.setGeometry(QtCore.QRect(210, 230, 118, 22))
         self.time_edit.setObjectName("time_edit")
         
         # start of the tab widget
         self.tab_bar = QtWidgets.QTabWidget(self.centralwidget)
-        self.tab_bar.setGeometry(QtCore.QRect(10, 300, 771, 211))
+        self.tab_bar.setGeometry(QtCore.QRect(10, 260, 771, 211))
         self.tab_bar.setObjectName("tab_bar")
 
         self.dir_tab = QtWidgets.QWidget()
@@ -225,7 +230,7 @@ class CreateWindow(QtWidgets.QWidget):
         self.cancel_btn.setObjectName("cancel_btn")
         self.cancel_btn.clicked.connect(self.close_window)
 
-        self.main_radio_changed(self.main_interval_radio)
+        self.main_radio_changed(self.main_manual_radio)
         self.retranslate_ui()
         #QtCore.QMetaObject.connectSlotsByName(self)
 
@@ -256,6 +261,7 @@ class CreateWindow(QtWidgets.QWidget):
         self.tab_bar.setTabText(self.tab_bar.indexOf(self.files_tab), _translate("create_window", "Files"))
 
         # radio buttons
+        self.main_manual_radio.setText(_translate("create_window", "Manual"))
         self.main_interval_radio.setText(_translate("create_window", "Interval"))
         self.main_datetime_radio.setText(_translate("create_window", "Date/Time"))
         self.main_newest_radio.setText(_translate("create_window", "Newest"))
@@ -292,17 +298,17 @@ class CreateWindow(QtWidgets.QWidget):
     def main_radio_changed(self, button: QtWidgets.QAbstractButton) -> None:
         group = button.group()
         btn_id = group.id(button)
-        is_interval_btn = btn_id == 1
-        is_date_time_btn = btn_id == 2
+        is_interval_btn = btn_id != 2
+        is_date_time_btn = btn_id != 3
 
-        self.repeat_label.setEnabled(is_interval_btn)
-        self.repeat_spin.setEnabled(is_interval_btn)
-        self.interval_type_combo.setEnabled(is_interval_btn)
+        self.repeat_label.setHidden(is_interval_btn)
+        self.repeat_spin.setHidden(is_interval_btn)
+        self.interval_type_combo.setHidden(is_interval_btn)
 
-        self.day_month_label.setEnabled(is_date_time_btn)
-        self.day_month_spin.setEnabled(is_date_time_btn)
-        self.time_label.setEnabled(is_date_time_btn)
-        self.time_edit.setEnabled(is_date_time_btn)
+        self.day_month_label.setHidden(is_date_time_btn)
+        self.day_month_spin.setHidden(is_date_time_btn)
+        self.time_label.setHidden(is_date_time_btn)
+        self.time_edit.setHidden(is_date_time_btn)
 
     def open_file_explorer(self):
         file_dialog = QtWidgets.QFileDialog.getExistingDirectory(
