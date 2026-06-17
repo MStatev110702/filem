@@ -19,6 +19,7 @@ class CreateWindow(QtWidgets.QWidget):
         super().__init__()
         self.init_ui()
         self.required_fields = [self.name_input, self.origin_input]
+        self.type_combo_changed()
     
     def init_ui(self) -> None:
         # general window settings
@@ -298,11 +299,13 @@ class CreateWindow(QtWidgets.QWidget):
         self.close()
 
     def save_entry(self) -> None:
-        name = self.name_input.text()
-        print(self.form_is_valid())
         if not self.form_is_valid():
             ErrorWindow("Please ensure that all required fields are filled.").exec()
             return
+
+        if self.dest_input in self.required_fields and self.dest_input.text().strip() == self.origin_input.text().strip():
+            ErrorWindow("Please ensure that the destination- and originpath are not the same.").exec()
+            return 
 
         self.close_window()
 
@@ -310,16 +313,17 @@ class CreateWindow(QtWidgets.QWidget):
         for field in self.required_fields:
             if field.text().strip() == "":
                 return False
+
         return True
 
-    def type_combo_changed(self, index:int) -> None:
+    def type_combo_changed(self) -> None:
         value = self.type_combo.currentData()
         enabled = value != TypeComboValues.DELETE
         self.dest_label.setEnabled(enabled)
         self.dest_input.setEnabled(enabled)
         self.dest_tool_btn.setEnabled(enabled)
 
-        if enabled and self.desc_input in self.required_fields:
+        if enabled and self.dest_input in self.required_fields:
             self.required_fields.remove(self.dest_input)
         else:
             self.required_fields.append(self.dest_input)
