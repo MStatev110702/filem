@@ -1,5 +1,6 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
 from enum import Enum
+from error_window import ErrorWindow
 
 class TypeComboValues(Enum):
     COPY = "copy"
@@ -14,11 +15,12 @@ class IntervalTypeComboValues(Enum):
     MON = "months"
 
 class CreateWindow(QtWidgets.QWidget):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.init_ui()
+        self.required_fields = [self.name_input, self.origin_input]
     
-    def init_ui(self):
+    def init_ui(self) -> None:
         # general window settings
         self.setObjectName("create_window")
         self.resize(800, 550)
@@ -57,7 +59,7 @@ class CreateWindow(QtWidgets.QWidget):
         self.init_tab_bar()
         self.retranslate_ui()
 
-    def init_main_radio_ui(self):
+    def init_main_radio_ui(self) -> None:
         # radio menu for selecting the start of the script
         self.main_manual_radio = QtWidgets.QRadioButton(self.centralwidget)
         self.main_manual_radio.setGeometry(QtCore.QRect(20, 180, 97, 21))
@@ -92,6 +94,7 @@ class CreateWindow(QtWidgets.QWidget):
         self.repeat_spin = QtWidgets.QSpinBox(self.centralwidget)
         self.repeat_spin.setGeometry(QtCore.QRect(120, 230, 42, 22))
         self.repeat_spin.setObjectName("repeat_spin")
+        self.repeat_spin.setMinimum(1)
 
         self.interval_type_combo = QtWidgets.QComboBox(self.centralwidget)
         self.interval_type_combo.setGeometry(QtCore.QRect(220, 230, 100, 22))
@@ -106,6 +109,7 @@ class CreateWindow(QtWidgets.QWidget):
         self.day_month_spin = QtWidgets.QSpinBox(self.centralwidget)
         self.day_month_spin.setGeometry(QtCore.QRect(120, 230, 42, 22))
         self.day_month_spin.setObjectName("day_month_spin")
+        self.day_month_spin.setMinimum(1)
 
         self.time_label = QtWidgets.QLabel(self.centralwidget)
         self.time_label.setGeometry(QtCore.QRect(210, 230, 60, 16))
@@ -128,7 +132,7 @@ class CreateWindow(QtWidgets.QWidget):
         
         self.main_radio_changed(self.main_manual_radio)
 
-    def init_tab_bar(self):
+    def init_tab_bar(self) -> None:
         # start of the tab widget
         self.tab_bar = QtWidgets.QTabWidget(self.centralwidget)
         self.tab_bar.setGeometry(QtCore.QRect(10, 260, 771, 211))
@@ -147,7 +151,7 @@ class CreateWindow(QtWidgets.QWidget):
         self.init_dir_tab()
         self.init_files_tab()
 
-    def init_dir_tab(self):
+    def init_dir_tab(self) -> None:
         # originpath
         self.origin_label = QtWidgets.QLabel(self.dir_tab)
         self.origin_label.setGeometry(QtCore.QRect(10, 10, 91, 22))
@@ -205,7 +209,7 @@ class CreateWindow(QtWidgets.QWidget):
         dir_btn_group.addButton(self.dir_filled_radio)
         dir_btn_group.addButton(self.dir_all_radio)
 
-    def init_files_tab(self):
+    def init_files_tab(self) -> None:
         # files radio buttons
         self.files_none_radio = QtWidgets.QRadioButton(self.files_tab)
         self.files_none_radio.setGeometry(QtCore.QRect(20, 20, 121, 21))
@@ -244,7 +248,7 @@ class CreateWindow(QtWidgets.QWidget):
         self.add_btn.setGeometry(QtCore.QRect(660, 77, 81, 26))
         self.add_btn.setObjectName("add_btn")
 
-    def retranslate_ui(self):
+    def retranslate_ui(self) -> None:
         _translate = QtCore.QCoreApplication.translate
         self.setWindowTitle(_translate("create_window", "create"))
 
@@ -295,8 +299,18 @@ class CreateWindow(QtWidgets.QWidget):
 
     def save_entry(self) -> None:
         name = self.name_input.text()
-        print(name)
+        print(self.form_is_valid())
+        if not self.form_is_valid():
+            ErrorWindow("Please ensure that all required fields are filled.").exec()
+            return
+
         self.close_window()
+
+    def form_is_valid(self) -> bool:
+        for field in self.required_fields:
+            if field.text().strip() == "":
+                return False
+        return True
 
     def type_combo_changed(self, index:int) -> None:
         value = self.type_combo.currentData()
@@ -304,6 +318,11 @@ class CreateWindow(QtWidgets.QWidget):
         self.dest_label.setEnabled(enabled)
         self.dest_input.setEnabled(enabled)
         self.dest_tool_btn.setEnabled(enabled)
+
+        if enabled and self.desc_input in self.required_fields:
+            self.required_fields.remove(self.dest_input)
+        else:
+            self.required_fields.append(self.dest_input)
 
     def main_radio_changed(self, button: QtWidgets.QAbstractButton) -> None:
         group = button.group()
@@ -320,7 +339,7 @@ class CreateWindow(QtWidgets.QWidget):
         self.time_label.setHidden(is_date_time_btn)
         self.time_edit.setHidden(is_date_time_btn)
 
-    def open_file_explorer(self):
+    def open_file_explorer(self) -> None:
         file_dialog = QtWidgets.QFileDialog.getExistingDirectory(
             parent=self,
             caption="Select directory",
