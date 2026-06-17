@@ -16,6 +16,9 @@ class IntervalTypeComboValues(Enum):
 class CreateWindow(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
+        self.init_ui()
+    
+    def init_ui(self):
         # general window settings
         self.setObjectName("create_window")
         self.resize(800, 550)
@@ -50,6 +53,11 @@ class CreateWindow(QtWidgets.QWidget):
         self.load_combo_values(self.type_combo, TypeComboValues)
         self.type_combo.currentIndexChanged.connect(self.type_combo_changed)
 
+        self.init_main_radio_ui()
+        self.init_tab_bar()
+        self.retranslate_ui()
+
+    def init_main_radio_ui(self):
         # radio menu for selecting the start of the script
         self.main_manual_radio = QtWidgets.QRadioButton(self.centralwidget)
         self.main_manual_radio.setGeometry(QtCore.QRect(20, 180, 97, 21))
@@ -106,7 +114,21 @@ class CreateWindow(QtWidgets.QWidget):
         self.time_edit = QtWidgets.QTimeEdit(self.centralwidget)
         self.time_edit.setGeometry(QtCore.QRect(210, 230, 118, 22))
         self.time_edit.setObjectName("time_edit")
+
+        # statusbar
+        self.save_btn = QtWidgets.QPushButton(self.centralwidget)
+        self.save_btn.setGeometry(QtCore.QRect(600, 515, 81, 30))
+        self.save_btn.setObjectName("save_btn")
+        self.save_btn.clicked.connect(self.save_entry)
+
+        self.cancel_btn = QtWidgets.QPushButton(self.centralwidget)
+        self.cancel_btn.setGeometry(QtCore.QRect(700, 515, 81, 30))
+        self.cancel_btn.setObjectName("cancel_btn")
+        self.cancel_btn.clicked.connect(self.close_window)
         
+        self.main_radio_changed(self.main_manual_radio)
+
+    def init_tab_bar(self):
         # start of the tab widget
         self.tab_bar = QtWidgets.QTabWidget(self.centralwidget)
         self.tab_bar.setGeometry(QtCore.QRect(10, 260, 771, 211))
@@ -122,7 +144,10 @@ class CreateWindow(QtWidgets.QWidget):
         self.tab_bar.addTab(self.files_tab, "")
         self.tab_bar.setCurrentIndex(0)
 
-        # directory tab
+        self.init_dir_tab()
+        self.init_files_tab()
+
+    def init_dir_tab(self):
         # originpath
         self.origin_label = QtWidgets.QLabel(self.dir_tab)
         self.origin_label.setGeometry(QtCore.QRect(10, 10, 91, 22))
@@ -180,7 +205,7 @@ class CreateWindow(QtWidgets.QWidget):
         dir_btn_group.addButton(self.dir_filled_radio)
         dir_btn_group.addButton(self.dir_all_radio)
 
-        # files tab
+    def init_files_tab(self):
         # files radio buttons
         self.files_none_radio = QtWidgets.QRadioButton(self.files_tab)
         self.files_none_radio.setGeometry(QtCore.QRect(20, 20, 121, 21))
@@ -218,21 +243,6 @@ class CreateWindow(QtWidgets.QWidget):
         self.add_btn = QtWidgets.QPushButton(self.files_tab)
         self.add_btn.setGeometry(QtCore.QRect(660, 77, 81, 26))
         self.add_btn.setObjectName("add_btn")
-
-        # statusbar
-        self.save_btn = QtWidgets.QPushButton(self.centralwidget)
-        self.save_btn.setGeometry(QtCore.QRect(600, 515, 81, 30))
-        self.save_btn.setObjectName("save_btn")
-        self.save_btn.clicked.connect(self.save_entry)
-
-        self.cancel_btn = QtWidgets.QPushButton(self.centralwidget)
-        self.cancel_btn.setGeometry(QtCore.QRect(700, 515, 81, 30))
-        self.cancel_btn.setObjectName("cancel_btn")
-        self.cancel_btn.clicked.connect(self.close_window)
-
-        self.main_radio_changed(self.main_manual_radio)
-        self.retranslate_ui()
-        #QtCore.QMetaObject.connectSlotsByName(self)
 
     def retranslate_ui(self):
         _translate = QtCore.QCoreApplication.translate
