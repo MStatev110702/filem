@@ -1,18 +1,9 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
 from enum import Enum
 from error_window import ErrorWindow
-
-class TypeComboValues(Enum):
-    COPY = "copy"
-    DELETE = "delete"
-    MOVE = "move"
-
-class IntervalTypeComboValues(Enum):
-    S = "seconds"
-    MIN = "minutes"
-    H = "hours"
-    D = "days"
-    MON = "months"
+from sqlite import create_entry
+from entry import Entry
+from create_window_enums import TypeComboValues, IntervalTypeComboValues
 
 class CreateWindow(QtWidgets.QWidget):
     def __init__(self) -> None:
@@ -79,13 +70,13 @@ class CreateWindow(QtWidgets.QWidget):
         self.main_newest_radio.setGeometry(QtCore.QRect(340, 180, 97, 21))
         self.main_newest_radio.setObjectName("main_newest_radio")
         
-        main_radio_group = QtWidgets.QButtonGroup(self.centralwidget)
-        main_radio_group.setExclusive(True)
-        main_radio_group.addButton(self.main_manual_radio, 1)
-        main_radio_group.addButton(self.main_interval_radio, 2)
-        main_radio_group.addButton(self.main_datetime_radio, 3)
-        main_radio_group.addButton(self.main_newest_radio, 4)
-        main_radio_group.buttonClicked.connect(self.main_radio_changed)
+        self.main_radio_group = QtWidgets.QButtonGroup(self.centralwidget)
+        self.main_radio_group.setExclusive(True)
+        self.main_radio_group.addButton(self.main_manual_radio, 1)
+        self.main_radio_group.addButton(self.main_interval_radio, 2)
+        self.main_radio_group.addButton(self.main_datetime_radio, 3)
+        self.main_radio_group.addButton(self.main_newest_radio, 4)
+        self.main_radio_group.buttonClicked.connect(self.main_radio_changed)
 
         # interval fields
         self.repeat_label = QtWidgets.QLabel(self.centralwidget)
@@ -203,12 +194,12 @@ class CreateWindow(QtWidgets.QWidget):
         self.dir_all_radio.setGeometry(QtCore.QRect(310, 120, 97, 21))
         self.dir_all_radio.setObjectName("dir_all_radio")
 
-        dir_btn_group = QtWidgets.QButtonGroup(self.dir_tab)
-        dir_btn_group.setExclusive(True)
-        dir_btn_group.addButton(self.dir_none_radio)
-        dir_btn_group.addButton(self.dir_empty_radio)
-        dir_btn_group.addButton(self.dir_filled_radio)
-        dir_btn_group.addButton(self.dir_all_radio)
+        self.dir_btn_group = QtWidgets.QButtonGroup(self.dir_tab)
+        self.dir_btn_group.setExclusive(True)
+        self.dir_btn_group.addButton(self.dir_none_radio)
+        self.dir_btn_group.addButton(self.dir_empty_radio)
+        self.dir_btn_group.addButton(self.dir_filled_radio)
+        self.dir_btn_group.addButton(self.dir_all_radio)
 
     def init_files_tab(self) -> None:
         # files radio buttons
@@ -229,12 +220,12 @@ class CreateWindow(QtWidgets.QWidget):
         self.files_all_radio.setGeometry(QtCore.QRect(20, 110, 121, 21))
         self.files_all_radio.setObjectName("files_all_radio")
 
-        files_btn_group = QtWidgets.QButtonGroup(self.files_tab)
-        files_btn_group.setExclusive(True)
-        files_btn_group.addButton(self.files_none_radio)
-        files_btn_group.addButton(self.files_selected_radio)
-        files_btn_group.addButton(self.files_exclude_radio)
-        files_btn_group.addButton(self.files_all_radio)
+        self.files_btn_group = QtWidgets.QButtonGroup(self.files_tab)
+        self.files_btn_group.setExclusive(True)
+        self.files_btn_group.addButton(self.files_none_radio)
+        self.files_btn_group.addButton(self.files_selected_radio)
+        self.files_btn_group.addButton(self.files_exclude_radio)
+        self.files_btn_group.addButton(self.files_all_radio)
 
         # type list and combobox
         self.listView = QtWidgets.QListView(self.files_tab)
@@ -276,18 +267,18 @@ class CreateWindow(QtWidgets.QWidget):
         self.tab_bar.setTabText(self.tab_bar.indexOf(self.files_tab), _translate("create_window", "Files"))
 
         # radio buttons
-        self.main_manual_radio.setText(_translate("create_window", "Manual"))
-        self.main_interval_radio.setText(_translate("create_window", "Interval"))
-        self.main_datetime_radio.setText(_translate("create_window", "Date/Time"))
-        self.main_newest_radio.setText(_translate("create_window", "Newest"))
-        self.dir_none_radio.setText(_translate("create_window", "None"))
-        self.dir_empty_radio.setText(_translate("create_window", "Empty"))
-        self.dir_filled_radio.setText(_translate("create_window", "Filled"))
-        self.dir_all_radio.setText(_translate("create_window", "All"))
-        self.files_none_radio.setText(_translate("create_window", "None"))
-        self.files_selected_radio.setText(_translate("create_window", "Selected types"))
-        self.files_exclude_radio.setText(_translate("create_window", "Exclude types"))
-        self.files_all_radio.setText(_translate("create_window", "All"))
+        self.main_manual_radio.setText(_translate("create_window", "manual"))
+        self.main_interval_radio.setText(_translate("create_window", "interval"))
+        self.main_datetime_radio.setText(_translate("create_window", "date/time"))
+        self.main_newest_radio.setText(_translate("create_window", "newest"))
+        self.dir_none_radio.setText(_translate("create_window", "none"))
+        self.dir_empty_radio.setText(_translate("create_window", "empty"))
+        self.dir_filled_radio.setText(_translate("create_window", "filled"))
+        self.dir_all_radio.setText(_translate("create_window", "all"))
+        self.files_none_radio.setText(_translate("create_window", "none"))
+        self.files_selected_radio.setText(_translate("create_window", "selected types"))
+        self.files_exclude_radio.setText(_translate("create_window", "exclude types"))
+        self.files_all_radio.setText(_translate("create_window", "all"))
 
     def load_combo_values(self, combobox: QtWidgets.QComboBox, values: type[Enum]) -> None:
         combobox.clear()
@@ -319,11 +310,12 @@ class CreateWindow(QtWidgets.QWidget):
     def type_combo_changed(self) -> None:
         value = self.type_combo.currentData()
         enabled = value != TypeComboValues.DELETE
+        
         self.dest_label.setEnabled(enabled)
         self.dest_input.setEnabled(enabled)
         self.dest_tool_btn.setEnabled(enabled)
 
-        if enabled and self.dest_input in self.required_fields:
+        if not enabled and self.dest_input in self.required_fields:
             self.required_fields.remove(self.dest_input)
         else:
             self.required_fields.append(self.dest_input)
