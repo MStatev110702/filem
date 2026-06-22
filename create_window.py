@@ -297,6 +297,41 @@ class CreateWindow(QtWidgets.QWidget):
         if self.dest_input in self.required_fields and self.dest_input.text().strip() == self.origin_input.text().strip():
             ErrorWindow("Please ensure that the destination- and originpath are not the same.").exec()
             return 
+        
+        schedule_value = 0
+        schedule_type = ""
+        destpath = ""
+        file_types = ""
+
+        main_group = self.main_radio_group.checkedButton().text() 
+
+        if main_group == "interval":
+            schedule_value = self.repeat_spin.value()
+            schedule_type = self.interval_type_combo.currentData().name
+        elif main_group == "date/time":
+            schedule_value = self.day_month_spin.value()
+            schedule_type = self.time_edit.time().toString("HH:mm:ss")
+
+        if self.dest_input in self.required_fields:
+            destpath = self.dest_input.text().strip()
+
+        entry = Entry(
+            name=self.name_input.text(),
+            description=self.desc_input.toPlainText().strip(),
+            type=self.type_combo.currentData().name,
+            interval_type=main_group,
+            schedule_type=schedule_type,
+            schedule_value=schedule_value,
+            originpath=self.origin_input.text().strip(),
+            destpath=destpath,
+            include_dir=self.dir_btn_group.checkedButton().text(),
+            include_files=self.files_btn_group.checkedButton().text(),
+            file_types=file_types
+        )
+
+        if not create_entry(entry):
+            ErrorWindow("Something went wrong while saving the entry.").exec()
+            return 
 
         self.close_window()
 
