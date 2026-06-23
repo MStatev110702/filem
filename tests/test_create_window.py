@@ -2,8 +2,8 @@ import unittest
 from pathlib import Path 
 from PyQt6 import QtWidgets
 import sys
-from create_window import CreateWindow
-from create_window_enums import TypeComboValues
+from src.create_window import CreateWindow
+from src.create_window_enums import TypeComboValues
 
 app = QtWidgets.QApplication(sys.argv)
 

@@ -1,5 +1,5 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
-from create_window import CreateWindow
+from .create_window import CreateWindow
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):

@@ -1,9 +1,9 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
 from enum import Enum
-from error_window import ErrorWindow
-from sqlite import create_entry
-from entry import Entry
-from create_window_enums import TypeComboValues, IntervalTypeComboValues
+from .error_window import ErrorWindow
+from .sqlite import create_entry
+from .entry import Entry
+from .create_window_enums import TypeComboValues, IntervalTypeComboValues
 
 class CreateWindow(QtWidgets.QWidget):
     def __init__(self) -> None:

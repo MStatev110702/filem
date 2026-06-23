@@ -1,8 +1,8 @@
 import sqlite3
-from typing import Tuple
-from entry import Entry
+from pathlib import Path
+from .entry import Entry
 
-database = "schema.db"
+DB_FILE = Path(__file__).resolve().parent.parent / "data" / "schema.db"
 
 def create_tables(cursor: sqlite3.Cursor, conn: sqlite3.Connection) -> None:
     try:
@@ -48,7 +48,7 @@ def tables_exist(cursor: sqlite3.Cursor) -> bool:
 def create_entry(entry: Entry) -> bool:
     success = False
     try:
-        with sqlite3.connect(database) as conn:
+        with sqlite3.connect(DB_FILE) as conn:
             cursor = conn.cursor()
 
             if not tables_exist(cursor):
