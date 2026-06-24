@@ -4,6 +4,7 @@ from .error_window import ErrorWindow
 from .sqlite import create_entry
 from .entry import Entry
 from .create_window_enums import TypeComboValues, IntervalTypeComboValues
+from .type_list_model import TypeListModel
 
 class CreateWindow(QtWidgets.QWidget):
     def __init__(self) -> None:
@@ -228,17 +229,23 @@ class CreateWindow(QtWidgets.QWidget):
         self.files_btn_group.addButton(self.files_all_radio)
 
         # type list and combobox
-        self.listView = QtWidgets.QListView(self.files_tab)
-        self.listView.setGeometry(QtCore.QRect(210, 10, 221, 161))
-        self.listView.setObjectName("listView")
+        self.type_list = QtWidgets.QListView(self.files_tab)
+        self.type_list.setGeometry(QtCore.QRect(210, 10, 221, 161))
+        self.type_list.setObjectName("type_list")
+        
+        self.type_list_model = TypeListModel()
+        self.type_list.setModel(self.type_list_model)
+        self.type_list.doubleClicked.connect(self.remove_type)
 
         self.files_combo = QtWidgets.QComboBox(self.files_tab)
         self.files_combo.setGeometry(QtCore.QRect(470, 80, 161, 22))
         self.files_combo.setObjectName("files_combo")
+        self.files_combo.setEditable(True)
 
         self.add_btn = QtWidgets.QPushButton(self.files_tab)
         self.add_btn.setGeometry(QtCore.QRect(660, 77, 81, 26))
         self.add_btn.setObjectName("add_btn")
+        self.add_btn.clicked.connect(self.add_type_to_list)
 
     def retranslate_ui(self) -> None:
         _translate = QtCore.QCoreApplication.translate
@@ -387,3 +394,11 @@ class CreateWindow(QtWidgets.QWidget):
         else:
             self.dest_input.setText(file_dialog)
 
+    def add_type_to_list(self) -> None:
+        value = self.files_combo.currentText().strip()
+        model = self.type_list_model
+        if value not in model.types and value != "":
+            model.add(value)
+    
+    def remove_type(self, index: QtCore.QModelIndex) -> None:
+        self.type_list_model.delete(index.row())
