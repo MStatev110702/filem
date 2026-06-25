@@ -29,7 +29,7 @@ def create_tables(cursor: sqlite3.Cursor, conn: sqlite3.Connection) -> None:
 
         conn.commit()
 
-    except sqlite3.OperationalError as e:
+    except sqlite3.DatabaseError as e:
         print("Failed to open database:", e)
 
 def tables_exist(cursor: sqlite3.Cursor) -> bool:
@@ -77,12 +77,7 @@ def create_entry(entry: Entry) -> bool:
             ))
             conn.commit()
             success = True
-    except sqlite3.OperationalError as e:
+    except sqlite3.DatabaseError as e:
         print("Failed to execute query:", e)
     
     return success
-def main():
-    create_entry()
-
-if __name__ == "__main__":
-    main()
