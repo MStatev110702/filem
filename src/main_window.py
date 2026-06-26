@@ -36,6 +36,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.search_btn = QtWidgets.QToolButton(self.centralwidget)
         self.search_btn.setGeometry(QtCore.QRect(650, 20, 26, 22))
         self.search_btn.setObjectName("search_btn")
+        self.search_btn.setIcon(QtGui.QIcon.fromTheme("system-search"))
+        self.search_btn.clicked.connect(self.search_entries)
 
         # table
         self.script_table = QtWidgets.QTableView(self.centralwidget)
@@ -44,7 +46,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.model = TableModel()
         self.script_table.setModel(self.model)
-
 
         # buttons
         self.create_btn = QtWidgets.QPushButton(self.centralwidget)
@@ -101,4 +102,8 @@ class MainWindow(QtWidgets.QMainWindow):
             ErrorWindow(f"There was an error while trying to delete the entry with the id: {row_id}").exec()
             return
         
-        self.model.load()
+        self.search_entries()
+
+    def search_entries(self):
+        name = self.search_input.text().strip()
+        self.model.load(name)

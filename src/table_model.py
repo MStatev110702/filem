@@ -42,9 +42,9 @@ class TableModel(QtCore.QAbstractTableModel):
 
         return section + 1
 
-    def load(self):
+    def load(self, name: str = ""):
         self.beginResetModel()
-        self._data = get_all_entries()
+        self._data = get_all_entries(name)
         self.endResetModel()
     
     def get_row_id(self, index):

@@ -82,7 +82,7 @@ def create_entry(entry: Entry) -> bool:
     
     return True
 
-def get_all_entries() -> List[Tuple]:
+def get_all_entries(name: str = "") -> List[Tuple]:
     try:
         with sqlite3.connect(DB_FILE) as conn:
             cursor = conn.cursor()
@@ -95,7 +95,14 @@ def get_all_entries() -> List[Tuple]:
                        originpath, destpath, include_dir, include_files, file_types, state
                 FROM scripts
             """
-            cursor.execute(sql)
+
+            params = ()
+
+            if name:
+                sql += "Where name like ?"
+                params = (f"%{name}%",)
+
+            cursor.execute(sql, params)
             rows = cursor.fetchall()
             return rows
     except sqlite3.DatabaseError as e:
