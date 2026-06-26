@@ -1,6 +1,8 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .create_window import CreateWindow
+from .error_window import ErrorWindow
 from .table_model import TableModel
+from .sqlite import delete_entry
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -53,6 +55,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.delete_btn = QtWidgets.QPushButton(self.centralwidget)
         self.delete_btn.setGeometry(QtCore.QRect(650, 110, 113, 32))
         self.delete_btn.setObjectName("delete_btn")
+        self.delete_btn.clicked.connect(self.delete_selected_entry)
 
         self.edit_btn = QtWidgets.QPushButton(self.centralwidget)
         self.edit_btn.setGeometry(QtCore.QRect(650, 150, 113, 32))
@@ -84,3 +87,18 @@ class MainWindow(QtWidgets.QMainWindow):
     def open_create_window(self):
         self.create_w = CreateWindow()
         self.create_w.show()
+
+    def delete_selected_entry(self):
+        index = self.script_table.selectionModel().currentIndex()
+
+        if index.row() == -1:
+            ErrorWindow("Please select one row in the table.").exec()
+            return
+
+        row_id = self.model.get_row_id(index)
+
+        if not delete_entry(row_id):
+            ErrorWindow(f"There was an error while trying to delete the entry with the id: {row_id}").exec()
+            return
+        
+        self.model.load()

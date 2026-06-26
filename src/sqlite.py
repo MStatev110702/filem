@@ -47,7 +47,6 @@ def tables_exist(cursor: sqlite3.Cursor) -> bool:
     return cursor.fetchone()[0] == len(tables)
 
 def create_entry(entry: Entry) -> bool:
-    success = False
     try:
         with sqlite3.connect(DB_FILE) as conn:
             cursor = conn.cursor()
@@ -77,11 +76,11 @@ def create_entry(entry: Entry) -> bool:
                 "off"
             ))
             conn.commit()
-            success = True
     except sqlite3.DatabaseError as e:
         print("Failed to execute query:", e)
+        return False
     
-    return success
+    return True
 
 def get_all_entries() -> List[Tuple]:
     try:
@@ -102,4 +101,23 @@ def get_all_entries() -> List[Tuple]:
     except sqlite3.DatabaseError as e:
         print("Failed to execute query:", e)
         return []
+    
+def delete_entry(id: int) -> bool:
+    try:
+        with sqlite3.connect(DB_FILE) as conn:
+            cursor = conn.cursor()
+
+            if not tables_exist(cursor):
+                create_tables(cursor, conn)
+                return False
+
+            sql = """
+                DELETE FROM scripts
+                WHERE id = ?
+            """
+            cursor.execute(sql, (id,))
+            return True
+    except sqlite3.DatabaseError as e:
+        print("Failed to execute query:", e)
+        return False
     
