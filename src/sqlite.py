@@ -1,5 +1,6 @@
 import sqlite3
 from pathlib import Path
+from typing import List, Tuple
 from .entry import Entry
 
 DB_FILE = Path(__file__).resolve().parent.parent / "data" / "schema.db"
@@ -81,3 +82,22 @@ def create_entry(entry: Entry) -> bool:
         print("Failed to execute query:", e)
     
     return success
+
+def get_all_entries() -> List[Tuple]:
+    try:
+        with sqlite3.connect(DB_FILE) as conn:
+            cursor = conn.cursor()
+
+            if not tables_exist(cursor):
+                create_tables(cursor, conn)
+
+            sql = """
+                SELECT * FROM scripts
+            """
+            cursor.execute(sql)
+            rows = cursor.fetchall()
+            return rows
+    except sqlite3.DatabaseError as e:
+        print("Failed to execute query:", e)
+        return []
+    

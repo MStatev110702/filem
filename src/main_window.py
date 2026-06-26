@@ -1,5 +1,7 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .create_window import CreateWindow
+from .table_model import TableModel
+from .sqlite import get_all_entries
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -16,7 +18,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.menubar = QtWidgets.QMenuBar(self)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
         self.menubar.setObjectName("menubar")
-
 
         # statusbar
         self.statusbar = QtWidgets.QStatusBar(self)
@@ -36,11 +37,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.search_btn.setObjectName("search_btn")
 
         # table
-        self.script_table = QtWidgets.QTableWidget(self.centralwidget)
+        self.script_table = QtWidgets.QTableView(self.centralwidget)
         self.script_table.setGeometry(QtCore.QRect(30, 60, 591, 441))
         self.script_table.setObjectName("script_table")
-        self.script_table.setColumnCount(0)
-        self.script_table.setRowCount(0)
+
+        self.model = TableModel()
+        self.script_table.setModel(self.model)
+
 
         # buttons
         self.create_btn = QtWidgets.QPushButton(self.centralwidget)
@@ -82,3 +85,6 @@ class MainWindow(QtWidgets.QMainWindow):
     def open_create_window(self):
         self.create_w = CreateWindow()
         self.create_w.show()
+
+    def get_table_entries(self):
+        rows = get_all_entries()
