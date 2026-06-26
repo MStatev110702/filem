@@ -92,7 +92,9 @@ def get_all_entries() -> List[Tuple]:
                 create_tables(cursor, conn)
 
             sql = """
-                SELECT * FROM scripts
+                SELECT id, name, description, type, interval_type, schedule_type, schedule_value,
+                       originpath, destpath, include_dir, include_files, file_types, state
+                FROM scripts
             """
             cursor.execute(sql)
             rows = cursor.fetchall()

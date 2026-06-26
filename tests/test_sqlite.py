@@ -9,7 +9,7 @@ class TestSqlite(unittest.TestCase):
         test_entry = Entry(
             name="Unittest create entry success copy",
             description="Unittest can be deleted",
-            type="copy",
+            type="COPY",
             interval_type="newest",
             schedule_type="",
             schedule_value=0,
@@ -29,7 +29,7 @@ class TestSqlite(unittest.TestCase):
         test_entry = Entry(
             name="Unittest create entry success copy",
             description="Unittest can be deleted",
-            type="copy",
+            type="COPY",
             interval_type="newest",
             schedule_type="",
             schedule_value=0,
@@ -58,7 +58,7 @@ class TestSqlite(unittest.TestCase):
         test_entry = Entry(
             name="Unittest create entry success copy",
             description="Unittest can be deleted",
-            type="copy",
+            type="COPY",
             interval_type="newest",
             schedule_type="",
             schedule_value=0,

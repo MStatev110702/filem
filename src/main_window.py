@@ -1,7 +1,6 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
 from .create_window import CreateWindow
 from .table_model import TableModel
-from .sqlite import get_all_entries
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -85,6 +84,3 @@ class MainWindow(QtWidgets.QMainWindow):
     def open_create_window(self):
         self.create_w = CreateWindow()
         self.create_w.show()
-
-    def get_table_entries(self):
-        rows = get_all_entries()
