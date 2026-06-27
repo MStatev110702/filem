@@ -1,16 +1,21 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
 from enum import Enum
 from .error_window import ErrorWindow
-from .sqlite import create_entry
+from .sqlite import create_entry, edit_entry
 from .entry import Entry
 from .create_window_enums import TypeComboValues, IntervalTypeComboValues
 from .type_list_model import TypeListModel
 
 class CreateWindow(QtWidgets.QWidget):
-    def __init__(self) -> None:
+    def __init__(self, parent:QtWidgets.QWidget, row: Entry|None=None) -> None:
         super().__init__()
         self.init_ui()
+        self.parent = parent
+        self.mode = "create" if not row else "edit"
+        self.row = row
         self.required_fields = [self.name_input, self.origin_input]
+        if self.mode == "edit":
+            self.update_fields()
         self.type_combo_changed()
     
     def init_ui(self) -> None:
@@ -323,6 +328,7 @@ class CreateWindow(QtWidgets.QWidget):
             destpath = self.dest_input.text().strip()
 
         entry = Entry(
+            id = None,
             name=self.name_input.text(),
             description=self.desc_input.toPlainText().strip(),
             type=self.type_combo.currentData().name,
@@ -336,11 +342,18 @@ class CreateWindow(QtWidgets.QWidget):
             file_types=file_types
         )
 
-        if not create_entry(entry):
+        if self.mode == "create":
+            success = create_entry(entry) 
+        else: 
+            entry.id = self.row.id
+            success = edit_entry(entry)
+
+        if not success:
             ErrorWindow("Something went wrong while saving the entry.").exec()
             return 
 
         self.close_window()
+        self.parent.model.load()
 
     def form_is_valid(self) -> bool:
         for field in self.required_fields:
@@ -402,3 +415,37 @@ class CreateWindow(QtWidgets.QWidget):
     
     def remove_type(self, index: QtCore.QModelIndex) -> None:
         self.type_list_model.delete(index.row())
+
+    def set_combo_value(self, combobox: QtWidgets.QComboBox, value: type[Enum]) -> None:      
+        index = combobox.findData(value)
+        print(index)
+        if index != -1:
+            combobox.setCurrentIndex(index)
+
+    def set_radio_by_text(self, group: QtWidgets.QButtonGroup, text: str):
+        for button in group.buttons():
+            if button.text() == text:
+                button.click()
+        
+    def update_fields(self) -> None:
+        self.name_input.setText(self.row.name.strip())
+        self.desc_input.insertPlainText(self.row.description.strip())
+        self.set_combo_value(self.type_combo, TypeComboValues[self.row.type.strip()])
+        self.set_radio_by_text(self.main_radio_group, self.row.interval_type.strip())
+        
+        if self.row.interval_type.strip() == "interval":
+            self.repeat_spin.setValue(self.row.schedule_value)
+            self.set_combo_value(self.interval_type_combo, IntervalTypeComboValues[self.row.schedule_type.strip()])
+        elif self.row.interval_type.strip() == "date/time":
+            self.day_month_spin.setValue(self.row.schedule_value)
+            self.time_edit.setTime(QtCore.QTime.fromString(self.row.schedule_type.strip(), "HH:mm:ss"))
+
+        self.origin_input.setText(self.row.originpath.strip())
+
+        if self.row.destpath.strip() != "":
+            self.dest_input.setText(self.row.destpath.strip())
+
+        self.set_radio_by_text(self.dir_btn_group, self.row.include_dir.strip())
+        self.set_radio_by_text(self.files_btn_group, self.row.include_files.strip())
+
+                

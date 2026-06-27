@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 @dataclass
 class Entry:
+    id: int|None
     name: str
     description: str
     type: str

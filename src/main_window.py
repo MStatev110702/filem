@@ -2,7 +2,7 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 from .create_window import CreateWindow
 from .error_window import ErrorWindow
 from .table_model import TableModel
-from .sqlite import delete_entry
+from .sqlite import delete_entry, get_selected_entry
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -46,6 +46,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.model = TableModel()
         self.script_table.setModel(self.model)
+        self.script_table.doubleClicked.connect(self.open_edit_window)
 
         # buttons
         self.create_btn = QtWidgets.QPushButton(self.centralwidget)
@@ -61,6 +62,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.edit_btn = QtWidgets.QPushButton(self.centralwidget)
         self.edit_btn.setGeometry(QtCore.QRect(650, 150, 113, 32))
         self.edit_btn.setObjectName("edit_btn")
+        self.edit_btn.clicked.connect(self.open_edit_window)
 
         self.start_btn = QtWidgets.QPushButton(self.centralwidget)
         self.start_btn.setGeometry(QtCore.QRect(650, 190, 113, 32))
@@ -71,7 +73,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.start_all_btn.setObjectName("start_all_btn")
 
         self.retranslate_ui()
-        #QtCore.QMetaObject.connectSlotsByName(self)
 
     def retranslate_ui(self):
         _translate = QtCore.QCoreApplication.translate
@@ -86,8 +87,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.start_all_btn.setText(_translate("MainWindow", "Start all"))
 
     def open_create_window(self):
-        self.create_w = CreateWindow()
-        self.create_w.show()
+        self.window = CreateWindow(self)
+        self.window.setWindowModality(QtCore.Qt.WindowModality.ApplicationModal)
+        self.window.show()
 
     def delete_selected_entry(self):
         index = self.script_table.selectionModel().currentIndex()
@@ -107,3 +109,24 @@ class MainWindow(QtWidgets.QMainWindow):
     def search_entries(self):
         name = self.search_input.text().strip()
         self.model.load(name)
+
+    def open_edit_window(self):
+        index = self.script_table.selectionModel().currentIndex()
+
+        if index.row() == -1:
+            ErrorWindow("Please select one row in the table.").exec()
+            return
+        
+        row_id = self.model.get_row_id(index)
+        entry = get_selected_entry(row_id)
+
+        if not entry:
+            ErrorWindow(f"Failed to retieve the entry with the id: {row_id}").exec()
+            return
+        
+        self.window = CreateWindow(self, entry)
+        self.window.setWindowModality(QtCore.Qt.WindowModality.ApplicationModal)
+        self.window.show()
+
+
+        
