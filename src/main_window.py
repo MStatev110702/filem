@@ -14,63 +14,69 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.centralwidget = QtWidgets.QWidget(self)
         self.centralwidget.setObjectName("centralwidget")
-
-        # menubar
-        self.menubar = QtWidgets.QMenuBar(self)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
-        self.menubar.setObjectName("menubar")
-
-        # statusbar
-        self.statusbar = QtWidgets.QStatusBar(self)
-        self.statusbar.setObjectName("statusbar")
-
         self.setCentralWidget(self.centralwidget)
-        self.setMenuBar(self.menubar)
-        self.setStatusBar(self.statusbar)
+
+        main_layout = QtWidgets.QHBoxLayout(self.centralwidget)
+        left_layout = QtWidgets.QVBoxLayout()
 
         # search input
-        self.search_input = QtWidgets.QLineEdit(self.centralwidget)
-        self.search_input.setGeometry(QtCore.QRect(30, 20, 591, 21))
+        search_layout = QtWidgets.QHBoxLayout()
+        self.search_input = QtWidgets.QLineEdit()
         self.search_input.setObjectName("search_input")
 
-        self.search_btn = QtWidgets.QToolButton(self.centralwidget)
-        self.search_btn.setGeometry(QtCore.QRect(650, 20, 26, 22))
+        self.search_btn = QtWidgets.QToolButton()
         self.search_btn.setObjectName("search_btn")
         self.search_btn.setIcon(QtGui.QIcon.fromTheme("system-search"))
         self.search_btn.clicked.connect(self.search_entries)
 
+        search_layout.addWidget(self.search_input)
+        search_layout.addWidget(self.search_btn)
+
         # table
-        self.script_table = QtWidgets.QTableView(self.centralwidget)
-        self.script_table.setGeometry(QtCore.QRect(30, 60, 591, 441))
+        self.script_table = QtWidgets.QTableView()
         self.script_table.setObjectName("script_table")
 
         self.model = TableModel()
         self.script_table.setModel(self.model)
         self.script_table.doubleClicked.connect(self.open_edit_window)
+        self.script_table.setSizePolicy(
+            QtWidgets.QSizePolicy.Policy.Expanding,
+            QtWidgets.QSizePolicy.Policy.Expanding
+        )
+
+        left_layout.addLayout(search_layout)
+        left_layout.addWidget(self.script_table)
 
         # buttons
-        self.create_btn = QtWidgets.QPushButton(self.centralwidget)
-        self.create_btn.setGeometry(QtCore.QRect(650, 70, 113, 32))
+        right_layout = QtWidgets.QVBoxLayout()
+
+        self.create_btn = QtWidgets.QPushButton()
         self.create_btn.setObjectName("create_btn")
         self.create_btn.clicked.connect(self.open_create_window)
 
-        self.delete_btn = QtWidgets.QPushButton(self.centralwidget)
-        self.delete_btn.setGeometry(QtCore.QRect(650, 110, 113, 32))
+        self.delete_btn = QtWidgets.QPushButton()
         self.delete_btn.setObjectName("delete_btn")
         self.delete_btn.clicked.connect(self.delete_selected_entry)
 
-        self.edit_btn = QtWidgets.QPushButton(self.centralwidget)
-        self.edit_btn.setGeometry(QtCore.QRect(650, 150, 113, 32))
+        self.edit_btn = QtWidgets.QPushButton()
         self.edit_btn.setObjectName("edit_btn")
         self.edit_btn.clicked.connect(self.open_edit_window)
 
-        self.start_btn = QtWidgets.QPushButton(self.centralwidget)
-        self.start_btn.setGeometry(QtCore.QRect(650, 190, 113, 32))
+        self.start_btn = QtWidgets.QPushButton()
         self.start_btn.setObjectName("start_btn")
 
         self.start_all_btn = QtWidgets.QPushButton(self.centralwidget)
-        self.start_all_btn.setGeometry(QtCore.QRect(650, 230, 113, 32))
         self.start_all_btn.setObjectName("start_all_btn")
+
+        right_layout.addWidget(self.create_btn)
+        right_layout.addWidget(self.delete_btn)
+        right_layout.addWidget(self.edit_btn)
+        right_layout.addWidget(self.start_btn)
+        right_layout.addWidget(self.start_all_btn)
+
+        right_layout.addStretch()
+        main_layout.addLayout(left_layout, stretch=4)
+        main_layout.addLayout(right_layout, stretch=1)
 
         self.retranslate_ui()
 
