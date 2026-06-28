@@ -14,6 +14,7 @@ class CreateWindow(QtWidgets.QWidget):
         self.mode = "create" if not row else "edit"
         self.row = row
         self.required_fields = [self.name_input, self.origin_input]
+        self.main_manual_radio.click()
         if self.mode == "edit":
             self.update_fields()
         self.type_combo_changed()
@@ -21,62 +22,70 @@ class CreateWindow(QtWidgets.QWidget):
     def init_ui(self) -> None:
         # general window settings
         self.setObjectName("create_window")
-        self.resize(800, 550)
+        self.resize(750, 550)
 
-        self.centralwidget = QtWidgets.QWidget(self)
-        self.centralwidget.setObjectName("centralwidget")
+        main_layout = QtWidgets.QVBoxLayout(self)
 
         # name, description and type input fields with their labels
-        self.name_label = QtWidgets.QLabel(self.centralwidget)
-        self.name_label.setGeometry(QtCore.QRect(20, 20, 70, 16))
+        form = QtWidgets.QGridLayout()
+        
+        self.name_label = QtWidgets.QLabel()
         self.name_label.setObjectName("name_label")
 
-        self.name_input = QtWidgets.QLineEdit(self.centralwidget)
-        self.name_input.setGeometry(QtCore.QRect(130, 20, 500, 22))
+        self.name_input = QtWidgets.QLineEdit()
         self.name_input.setObjectName("name_input")
+        self.name_input.setSizePolicy(
+            QtWidgets.QSizePolicy.Policy.Expanding,
+            QtWidgets.QSizePolicy.Policy.Fixed
+        )
 
-        self.desc_label = QtWidgets.QLabel(self.centralwidget)
-        self.desc_label.setGeometry(QtCore.QRect(20, 60, 70, 16))
+        self.desc_label = QtWidgets.QLabel()
         self.desc_label.setObjectName("desc_label")
 
-        self.desc_input = QtWidgets.QTextEdit(self.centralwidget)
-        self.desc_input.setGeometry(QtCore.QRect(130, 60, 500, 64))
+        self.desc_input = QtWidgets.QTextEdit()
         self.desc_input.setObjectName("desc_input")
 
-        self.type_label = QtWidgets.QLabel(self.centralwidget)
-        self.type_label.setGeometry(QtCore.QRect(20, 140, 70, 16))
+        self.type_label = QtWidgets.QLabel()
         self.type_label.setObjectName("type_label")
 
-        self.type_combo = QtWidgets.QComboBox(self.centralwidget)
-        self.type_combo.setGeometry(QtCore.QRect(124, 140, 514, 22))
+        self.type_combo = QtWidgets.QComboBox()
         self.type_combo.setObjectName("type_combo")
         self.load_combo_values(self.type_combo, TypeComboValues)
         self.type_combo.currentIndexChanged.connect(self.type_combo_changed)
 
-        self.init_main_radio_ui()
-        self.init_tab_bar()
-        self.retranslate_ui()
+        form.addWidget(self.name_label, 0, 0)
+        form.addWidget(self.name_input, 0, 1)
 
-    def init_main_radio_ui(self) -> None:
+        form.addWidget(self.desc_label, 1, 0)
+        form.addWidget(self.desc_input, 1, 1)
+
+        form.addWidget(self.type_label, 2, 0)
+        form.addWidget(self.type_combo, 2, 1)
+
+        #--- main radio buttons ---
+        radio_layout = QtWidgets.QHBoxLayout()
+
         # radio menu for selecting the start of the script
-        self.main_manual_radio = QtWidgets.QRadioButton(self.centralwidget)
-        self.main_manual_radio.setGeometry(QtCore.QRect(20, 180, 97, 21))
+        self.main_manual_radio = QtWidgets.QRadioButton()
         self.main_manual_radio.setObjectName("main_manual_radio")
-        self.main_manual_radio.setChecked(True)
 
-        self.main_interval_radio = QtWidgets.QRadioButton(self.centralwidget)
-        self.main_interval_radio.setGeometry(QtCore.QRect(140, 180, 97, 21))
+        self.main_interval_radio = QtWidgets.QRadioButton()
         self.main_interval_radio.setObjectName("main_interval_radio")
 
-        self.main_datetime_radio = QtWidgets.QRadioButton(self.centralwidget)
-        self.main_datetime_radio.setGeometry(QtCore.QRect(240, 180, 97, 21))
+        self.main_datetime_radio = QtWidgets.QRadioButton()
         self.main_datetime_radio.setObjectName("main_datetime_radio")
 
-        self.main_newest_radio = QtWidgets.QRadioButton(self.centralwidget)
-        self.main_newest_radio.setGeometry(QtCore.QRect(340, 180, 97, 21))
+        self.main_newest_radio = QtWidgets.QRadioButton()
         self.main_newest_radio.setObjectName("main_newest_radio")
-        
-        self.main_radio_group = QtWidgets.QButtonGroup(self.centralwidget)
+
+        radio_layout.addWidget(self.main_manual_radio)
+        radio_layout.addWidget(self.main_interval_radio)
+        radio_layout.addWidget(self.main_datetime_radio)
+        radio_layout.addWidget(self.main_newest_radio)
+        radio_layout.addStretch()
+
+        #--- main radio group ---
+        self.main_radio_group = QtWidgets.QButtonGroup()
         self.main_radio_group.setExclusive(True)
         self.main_radio_group.addButton(self.main_manual_radio, 1)
         self.main_radio_group.addButton(self.main_interval_radio, 2)
@@ -84,56 +93,57 @@ class CreateWindow(QtWidgets.QWidget):
         self.main_radio_group.addButton(self.main_newest_radio, 4)
         self.main_radio_group.buttonClicked.connect(self.main_radio_changed)
 
-        # interval fields
-        self.repeat_label = QtWidgets.QLabel(self.centralwidget)
-        self.repeat_label.setGeometry(QtCore.QRect(20, 230, 91, 16))
+        self.config_stack = QtWidgets.QStackedLayout()
+
+        #--- interval fields ---
+        interval_page = QtWidgets.QWidget()
+        interval_layout = QtWidgets.QHBoxLayout(interval_page)
+
+        self.repeat_label = QtWidgets.QLabel()
         self.repeat_label.setObjectName("repeat_label")
 
-        self.repeat_spin = QtWidgets.QSpinBox(self.centralwidget)
-        self.repeat_spin.setGeometry(QtCore.QRect(120, 230, 42, 22))
+        self.repeat_spin = QtWidgets.QSpinBox()
         self.repeat_spin.setObjectName("repeat_spin")
         self.repeat_spin.setMinimum(1)
 
-        self.interval_type_combo = QtWidgets.QComboBox(self.centralwidget)
-        self.interval_type_combo.setGeometry(QtCore.QRect(220, 230, 100, 22))
+        self.interval_type_combo = QtWidgets.QComboBox()
         self.interval_type_combo.setObjectName("interval_type_combo")
         self.load_combo_values(self.interval_type_combo, IntervalTypeComboValues)
 
-        # date/time fields
-        self.day_month_label = QtWidgets.QLabel(self.centralwidget)
-        self.day_month_label.setGeometry(QtCore.QRect(20, 230, 81, 16))
+        interval_layout.addWidget(self.repeat_label)
+        interval_layout.addWidget(self.repeat_spin)
+        interval_layout.addWidget(self.interval_type_combo)
+
+        #--- date/time fields ---
+        datetime_page = QtWidgets.QWidget()
+        datetime_layout = QtWidgets.QHBoxLayout(datetime_page)
+
+        self.day_month_label = QtWidgets.QLabel()
         self.day_month_label.setObjectName("day_month_label")
 
-        self.day_month_spin = QtWidgets.QSpinBox(self.centralwidget)
-        self.day_month_spin.setGeometry(QtCore.QRect(120, 230, 42, 22))
+        self.day_month_spin = QtWidgets.QSpinBox()
         self.day_month_spin.setObjectName("day_month_spin")
         self.day_month_spin.setMinimum(1)
 
-        self.time_label = QtWidgets.QLabel(self.centralwidget)
-        self.time_label.setGeometry(QtCore.QRect(210, 230, 60, 16))
+        self.time_label = QtWidgets.QLabel()
         self.time_label.setObjectName("time_label")
 
-        self.time_edit = QtWidgets.QTimeEdit(self.centralwidget)
-        self.time_edit.setGeometry(QtCore.QRect(210, 230, 118, 22))
+        self.time_edit = QtWidgets.QTimeEdit()
         self.time_edit.setObjectName("time_edit")
 
-        # statusbar
-        self.save_btn = QtWidgets.QPushButton(self.centralwidget)
-        self.save_btn.setGeometry(QtCore.QRect(600, 515, 81, 30))
-        self.save_btn.setObjectName("save_btn")
-        self.save_btn.clicked.connect(self.save_entry)
+        datetime_layout.addWidget(self.day_month_label)
+        datetime_layout.addWidget(self.day_month_spin)
+        datetime_layout.addWidget(self.time_label)
+        datetime_layout.addWidget(self.time_edit)
 
-        self.cancel_btn = QtWidgets.QPushButton(self.centralwidget)
-        self.cancel_btn.setGeometry(QtCore.QRect(700, 515, 81, 30))
-        self.cancel_btn.setObjectName("cancel_btn")
-        self.cancel_btn.clicked.connect(self.close_window)
-        
-        self.main_radio_changed(self.main_manual_radio)
+        self.config_stack.addWidget(interval_page)
+        self.config_stack.addWidget(datetime_page)
 
-    def init_tab_bar(self) -> None:
+        self.stack_widget = QtWidgets.QWidget()
+        self.stack_widget.setLayout(self.config_stack)
+
         # start of the tab widget
-        self.tab_bar = QtWidgets.QTabWidget(self.centralwidget)
-        self.tab_bar.setGeometry(QtCore.QRect(10, 260, 771, 211))
+        self.tab_bar = QtWidgets.QTabWidget()
         self.tab_bar.setObjectName("tab_bar")
 
         self.dir_tab = QtWidgets.QWidget()
@@ -146,59 +156,61 @@ class CreateWindow(QtWidgets.QWidget):
         self.tab_bar.addTab(self.files_tab, "")
         self.tab_bar.setCurrentIndex(0)
 
-        self.init_dir_tab()
-        self.init_files_tab()
+        #--- directory tab ---
+        dir_layout = QtWidgets.QGridLayout(self.dir_tab)
 
-    def init_dir_tab(self) -> None:
         # originpath
         self.origin_label = QtWidgets.QLabel(self.dir_tab)
-        self.origin_label.setGeometry(QtCore.QRect(10, 10, 91, 22))
         self.origin_label.setObjectName("origin_label")
 
         self.origin_input = QtWidgets.QLineEdit(self.dir_tab)
-        self.origin_input.setGeometry(QtCore.QRect(120, 10, 441, 22))
         self.origin_input.setObjectName("origin_input")
 
         self.origin_tool_btn = QtWidgets.QToolButton(self.dir_tab)
-        self.origin_tool_btn.setGeometry(QtCore.QRect(570, 11, 19, 18))
         self.origin_tool_btn.setObjectName("origin_tool_btn")
         self.origin_tool_btn.clicked.connect(self.open_file_explorer)
-        
+
         # destinationpath
         self.dest_label = QtWidgets.QLabel(self.dir_tab)
-        self.dest_label.setGeometry(QtCore.QRect(10, 40, 101, 22))
         self.dest_label.setObjectName("dest_label")
 
         self.dest_input = QtWidgets.QLineEdit(self.dir_tab)
-        self.dest_input.setGeometry(QtCore.QRect(120, 40, 441, 22))
         self.dest_input.setObjectName("dest_input")
 
         self.dest_tool_btn = QtWidgets.QToolButton(self.dir_tab)
-        self.dest_tool_btn.setGeometry(QtCore.QRect(570, 41, 19, 18))
         self.dest_tool_btn.setObjectName("dest_tool_btn")
         self.dest_tool_btn.clicked.connect(self.open_file_explorer)
 
+        dir_layout.addWidget(self.origin_label, 0, 0)
+        dir_layout.addWidget(self.origin_input, 0, 1)
+        dir_layout.addWidget(self.origin_tool_btn, 0, 2)
+
+        dir_layout.addWidget(self.dest_label, 1, 0)
+        dir_layout.addWidget(self.dest_input, 1, 1)
+        dir_layout.addWidget(self.dest_tool_btn, 1, 2)
+
         # include directory radio buttons
-        self.include_dir_label = QtWidgets.QLabel(self.dir_tab)
-        self.include_dir_label.setGeometry(QtCore.QRect(10, 80, 161, 22))
-        self.include_dir_label.setObjectName("include_dir_label")
+        dir_radio_layout = QtWidgets.QHBoxLayout()
 
         self.dir_none_radio = QtWidgets.QRadioButton(self.dir_tab)
-        self.dir_none_radio.setGeometry(QtCore.QRect(10, 120, 97, 21))
         self.dir_none_radio.setObjectName("dir_none_radio")
         self.dir_none_radio.setChecked(True)
 
         self.dir_empty_radio = QtWidgets.QRadioButton(self.dir_tab)
-        self.dir_empty_radio.setGeometry(QtCore.QRect(100, 120, 97, 21))
         self.dir_empty_radio.setObjectName("dir_empty_radio")
 
         self.dir_filled_radio = QtWidgets.QRadioButton(self.dir_tab)
-        self.dir_filled_radio.setGeometry(QtCore.QRect(210, 120, 97, 21))
         self.dir_filled_radio.setObjectName("dir_filled_radio")
 
         self.dir_all_radio = QtWidgets.QRadioButton(self.dir_tab)
-        self.dir_all_radio.setGeometry(QtCore.QRect(310, 120, 97, 21))
         self.dir_all_radio.setObjectName("dir_all_radio")
+
+        dir_radio_layout.addWidget(self.dir_none_radio)
+        dir_radio_layout.addWidget(self.dir_empty_radio)
+        dir_radio_layout.addWidget(self.dir_filled_radio)
+        dir_radio_layout.addWidget(self.dir_all_radio)
+
+        dir_layout.addLayout(dir_radio_layout, 2, 0, 1, 3)
 
         self.dir_btn_group = QtWidgets.QButtonGroup(self.dir_tab)
         self.dir_btn_group.setExclusive(True)
@@ -207,24 +219,28 @@ class CreateWindow(QtWidgets.QWidget):
         self.dir_btn_group.addButton(self.dir_filled_radio)
         self.dir_btn_group.addButton(self.dir_all_radio)
 
-    def init_files_tab(self) -> None:
+        #--- files tab ---
+        files_layout = QtWidgets.QGridLayout(self.files_tab)
+        
         # files radio buttons
         self.files_none_radio = QtWidgets.QRadioButton(self.files_tab)
-        self.files_none_radio.setGeometry(QtCore.QRect(20, 20, 121, 21))
         self.files_none_radio.setObjectName("files_none_radio")
         self.files_none_radio.setChecked(True)
 
         self.files_selected_radio = QtWidgets.QRadioButton(self.files_tab)
-        self.files_selected_radio.setGeometry(QtCore.QRect(20, 50, 121, 21))
         self.files_selected_radio.setObjectName("files_selected_radio")
 
         self.files_exclude_radio = QtWidgets.QRadioButton(self.files_tab)
-        self.files_exclude_radio.setGeometry(QtCore.QRect(20, 80, 121, 21))
         self.files_exclude_radio.setObjectName("files_exclude_radio")
 
         self.files_all_radio = QtWidgets.QRadioButton(self.files_tab)
-        self.files_all_radio.setGeometry(QtCore.QRect(20, 110, 121, 21))
         self.files_all_radio.setObjectName("files_all_radio")
+
+        files_radio_layout = QtWidgets.QHBoxLayout()
+        files_radio_layout.addWidget(self.files_none_radio)
+        files_radio_layout.addWidget(self.files_selected_radio)
+        files_radio_layout.addWidget(self.files_exclude_radio)
+        files_radio_layout.addWidget(self.files_all_radio)
 
         self.files_btn_group = QtWidgets.QButtonGroup(self.files_tab)
         self.files_btn_group.setExclusive(True)
@@ -235,7 +251,6 @@ class CreateWindow(QtWidgets.QWidget):
 
         # type list and combobox
         self.type_list = QtWidgets.QListView(self.files_tab)
-        self.type_list.setGeometry(QtCore.QRect(210, 10, 221, 161))
         self.type_list.setObjectName("type_list")
         
         self.type_list_model = TypeListModel()
@@ -243,14 +258,43 @@ class CreateWindow(QtWidgets.QWidget):
         self.type_list.doubleClicked.connect(self.remove_type)
 
         self.files_combo = QtWidgets.QComboBox(self.files_tab)
-        self.files_combo.setGeometry(QtCore.QRect(470, 80, 161, 22))
         self.files_combo.setObjectName("files_combo")
         self.files_combo.setEditable(True)
 
         self.add_btn = QtWidgets.QPushButton(self.files_tab)
-        self.add_btn.setGeometry(QtCore.QRect(660, 77, 81, 26))
         self.add_btn.setObjectName("add_btn")
         self.add_btn.clicked.connect(self.add_type_to_list)
+
+        files_layout.addWidget(self.type_list, 0, 0, 3, 1)
+
+        files_layout.addWidget(self.files_combo, 0, 1)
+        files_layout.addWidget(self.add_btn, 1, 1)
+        files_layout.addLayout(files_radio_layout, 2, 1)
+
+        self.dir_tab.setLayout(dir_layout)
+        self.files_tab.setLayout(files_layout)
+
+        #--- statusbar ---
+        statusbar_layout = QtWidgets.QHBoxLayout()
+        self.save_btn = QtWidgets.QPushButton()
+        self.save_btn.setObjectName("save_btn")
+        self.save_btn.clicked.connect(self.save_entry)
+
+        self.cancel_btn = QtWidgets.QPushButton()
+        self.cancel_btn.setObjectName("cancel_btn")
+        self.cancel_btn.clicked.connect(self.close_window)
+
+        statusbar_layout.addStretch()
+        statusbar_layout.addWidget(self.save_btn)
+        statusbar_layout.addWidget(self.cancel_btn)
+
+        main_layout.addLayout(form)
+        main_layout.addLayout(radio_layout)
+        main_layout.addWidget(self.stack_widget)
+        main_layout.addWidget(self.tab_bar)
+        main_layout.addLayout(statusbar_layout)
+
+        self.retranslate_ui()
 
     def retranslate_ui(self) -> None:
         _translate = QtCore.QCoreApplication.translate
@@ -264,7 +308,6 @@ class CreateWindow(QtWidgets.QWidget):
         self.time_label.setText(_translate("create_window", "Time"))
         self.day_month_label.setText(_translate("create_window", "Day of month"))
         self.origin_label.setText(_translate("create_window", "Originpath"))
-        self.include_dir_label.setText(_translate("create_window", "Include directories?"))
         self.dest_label.setText(_translate("create_window", "Destinationpath"))
 
         # buttons
@@ -378,17 +421,14 @@ class CreateWindow(QtWidgets.QWidget):
     def main_radio_changed(self, button: QtWidgets.QAbstractButton) -> None:
         group = button.group()
         btn_id = group.id(button)
-        is_interval_btn = btn_id != 2
-        is_date_time_btn = btn_id != 3
+        self.stack_widget.hide()
 
-        self.repeat_label.setHidden(is_interval_btn)
-        self.repeat_spin.setHidden(is_interval_btn)
-        self.interval_type_combo.setHidden(is_interval_btn)
-
-        self.day_month_label.setHidden(is_date_time_btn)
-        self.day_month_spin.setHidden(is_date_time_btn)
-        self.time_label.setHidden(is_date_time_btn)
-        self.time_edit.setHidden(is_date_time_btn)
+        if btn_id == 2:
+            self.config_stack.setCurrentIndex(0)
+            self.stack_widget.show()
+        elif btn_id == 3:
+            self.config_stack.setCurrentIndex(1)
+            self.stack_widget.show()
 
     def open_file_explorer(self) -> None:
         file_dialog = QtWidgets.QFileDialog.getExistingDirectory(
@@ -418,7 +458,7 @@ class CreateWindow(QtWidgets.QWidget):
 
     def set_combo_value(self, combobox: QtWidgets.QComboBox, value: type[Enum]) -> None:      
         index = combobox.findData(value)
-        print(index)
+
         if index != -1:
             combobox.setCurrentIndex(index)
 

@@ -7,6 +7,7 @@ from src.sqlite import create_entry
 class TestSqlite(unittest.TestCase):
     def test_create_entry_success(self):
         test_entry = Entry(
+            id=None,
             name="Unittest create entry success copy",
             description="Unittest can be deleted",
             type="COPY",
@@ -27,6 +28,7 @@ class TestSqlite(unittest.TestCase):
     def test_create_entry_connection_failure(self, mock_connect):
         mock_connect.side_effect = sqlite3.OperationalError("DB unavailable")
         test_entry = Entry(
+            id=None,
             name="Unittest create entry success copy",
             description="Unittest can be deleted",
             type="COPY",
@@ -56,6 +58,7 @@ class TestSqlite(unittest.TestCase):
         mock_connect.return_value = mock_conn
 
         test_entry = Entry(
+            id=None,
             name="Unittest create entry success copy",
             description="Unittest can be deleted",
             type="COPY",

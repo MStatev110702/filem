@@ -3,13 +3,14 @@ from pathlib import Path
 from PyQt6 import QtWidgets
 import sys
 from src.create_window import CreateWindow
+from src.main_window import MainWindow
 from src.create_window_enums import TypeComboValues
 
 app = QtWidgets.QApplication(sys.argv)
 
 class TestCreateWindow(unittest.TestCase):
     def test_form_is_valid_copy_valid_case(self):
-        window = CreateWindow()
+        window = CreateWindow(MainWindow())
         window.name_input.setText("Test Case")
         window.desc_input.setText("Test")
         window.type_combo.setCurrentIndex(window.type_combo.findData(TypeComboValues.COPY))
@@ -18,7 +19,7 @@ class TestCreateWindow(unittest.TestCase):
         self.assertEqual(window.form_is_valid(), True)
 
     def test_form_is_valid_copy_empty_values_case(self):
-        window = CreateWindow()
+        window = CreateWindow(MainWindow())
         window.name_input.setText("")
         window.desc_input.setText("Test")
         window.type_combo.setCurrentIndex(window.type_combo.findData(TypeComboValues.COPY))
@@ -27,7 +28,7 @@ class TestCreateWindow(unittest.TestCase):
         self.assertEqual(window.form_is_valid(), False)
 
     def test_form_is_valid_copy_empty_spaces_case(self):
-        window = CreateWindow()
+        window = CreateWindow(MainWindow())
         window.name_input.setText("Test Case")
         window.desc_input.setText("Test")
         window.type_combo.setCurrentIndex(window.type_combo.findData(TypeComboValues.COPY))
@@ -36,7 +37,7 @@ class TestCreateWindow(unittest.TestCase):
         self.assertEqual(window.form_is_valid(), False)
 
     def test_form_is_valid_move_valid_case(self):
-        window = CreateWindow()
+        window = CreateWindow(MainWindow())
         window.name_input.setText("Test Case")
         window.desc_input.setText("")
         window.type_combo.setCurrentIndex(window.type_combo.findData(TypeComboValues.MOVE))
@@ -45,7 +46,7 @@ class TestCreateWindow(unittest.TestCase):
         self.assertEqual(window.form_is_valid(), True)
 
     def test_form_is_valid_move_empty_values_case(self):
-        window = CreateWindow()
+        window = CreateWindow(MainWindow())
         window.name_input.setText("")
         window.desc_input.setText("Test")
         window.type_combo.setCurrentIndex(window.type_combo.findData(TypeComboValues.MOVE))
@@ -54,7 +55,7 @@ class TestCreateWindow(unittest.TestCase):
         self.assertEqual(window.form_is_valid(), False)
 
     def test_form_is_valid_move_empty_spaces_case(self):
-        window = CreateWindow()
+        window = CreateWindow(MainWindow())
         window.name_input.setText("    ")
         window.desc_input.setText("Test")
         window.type_combo.setCurrentIndex(window.type_combo.findData(TypeComboValues.MOVE))
@@ -63,7 +64,7 @@ class TestCreateWindow(unittest.TestCase):
         self.assertEqual(window.form_is_valid(), False)
     
     def test_form_is_valid_delete_valid_case(self):
-        window = CreateWindow()
+        window = CreateWindow(MainWindow())
         window.name_input.setText("Test Case3")
         window.desc_input.setText("Test123")
         window.type_combo.setCurrentIndex(window.type_combo.findData(TypeComboValues.DELETE))
@@ -72,7 +73,7 @@ class TestCreateWindow(unittest.TestCase):
         self.assertEqual(window.form_is_valid(), True)
 
     def test_form_is_valid_delete_empty_values_case(self):
-        window = CreateWindow()
+        window = CreateWindow(MainWindow())
         window.name_input.setText("")
         window.desc_input.setText("Test")
         window.type_combo.setCurrentIndex(window.type_combo.findData(TypeComboValues.DELETE))
@@ -80,7 +81,7 @@ class TestCreateWindow(unittest.TestCase):
         self.assertEqual(window.form_is_valid(), False)
 
     def test_form_is_valid_delete_empty_spaces_case(self):
-        window = CreateWindow()
+        window = CreateWindow(MainWindow())
         window.name_input.setText("Test123")
         window.desc_input.setText("Test")
         window.type_combo.setCurrentIndex(window.type_combo.findData(TypeComboValues.DELETE))
