@@ -1,5 +1,8 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
 from enum import Enum
+import platform
+from pathlib import Path
+from pathvalidate import is_valid_filepath
 from .error_window import ErrorWindow
 from .sqlite import create_entry, edit_entry
 from .entry import Entry
@@ -301,14 +304,14 @@ class CreateWindow(QtWidgets.QWidget):
         self.setWindowTitle(_translate("create_window", "create"))
 
         # labels
-        self.name_label.setText(_translate("create_window", "Name"))
+        self.name_label.setText(_translate("create_window", "*Name"))
         self.desc_label.setText(_translate("create_window", "Description"))
         self.repeat_label.setText(_translate("create_window", "Repeat every"))
         self.type_label.setText(_translate("create_window", "Type"))
         self.time_label.setText(_translate("create_window", "Time"))
         self.day_month_label.setText(_translate("create_window", "Day of month"))
-        self.origin_label.setText(_translate("create_window", "Originpath"))
-        self.dest_label.setText(_translate("create_window", "Destinationpath"))
+        self.origin_label.setText(_translate("create_window", "*Originpath"))
+        self.dest_label.setText(_translate("create_window", "*Destinationpath"))
 
         # buttons
         self.save_btn.setText(_translate("create_window", "save"))
@@ -322,7 +325,7 @@ class CreateWindow(QtWidgets.QWidget):
         self.tab_bar.setTabText(self.tab_bar.indexOf(self.files_tab), _translate("create_window", "Files"))
 
         # radio buttons
-        self.main_manual_radio.setText(_translate("create_window", "manual"))
+        self.main_manual_radio.setText(_translate("create_window", "manually"))
         self.main_interval_radio.setText(_translate("create_window", "interval"))
         self.main_datetime_radio.setText(_translate("create_window", "date/time"))
         self.main_newest_radio.setText(_translate("create_window", "newest"))
@@ -346,12 +349,30 @@ class CreateWindow(QtWidgets.QWidget):
 
     def save_entry(self) -> None:
         if not self.form_is_valid():
-            ErrorWindow("Please ensure that all required fields are filled.").exec()
+            ErrorWindow("Please ensure that all required (*) fields are filled.").exec()
             return
+        
+        dest_path = self.dest_input.text().strip()
+        origin_path = self.origin_input.text().strip()
 
-        if self.dest_input in self.required_fields and self.dest_input.text().strip() == self.origin_input.text().strip():
+        if self.dest_input in self.required_fields and dest_path == origin_path:
             ErrorWindow("Please ensure that the destination- and originpath are not the same.").exec()
             return 
+        
+        dest_valid = self.path_is_valid(dest_path)
+        origin_valid = self.path_is_valid(origin_path)
+
+        if not dest_valid or not origin_valid:
+            invalid_paths = []
+
+            if not origin_valid:
+                invalid_paths.append("originpath")
+
+            if not dest_valid:
+                invalid_paths.append("destinationpath")
+
+            ErrorWindow(f"The {' and '.join(invalid_paths)} is/are invalid").exec()
+            return  
         
         schedule_value = 0
         schedule_type = ""
@@ -404,7 +425,30 @@ class CreateWindow(QtWidgets.QWidget):
                 return False
 
         return True
+    
+    def path_is_valid(self, path: str) -> bool:
+        system = platform.system()
 
+        if system == "Windows":
+            user_platform = "windows"
+            is_abs = path.startswith("\\") or (len(path) > 2 and path[1:3] == ":\\")
+        elif system == "Linux":
+            user_platform = "linux"
+            is_abs = path.startswith("/")
+        elif system == "Darwin":
+            user_platform = "macos"
+            is_abs = path.startswith("/")
+        else:
+            user_platform = "universal"
+            return False
+
+        if not is_abs:
+            return False
+
+        if "." in Path(path).name:
+            return False
+        
+        return is_valid_filepath(path, platform=user_platform)
     def type_combo_changed(self) -> None:
         value = self.type_combo.currentData()
         enabled = value != TypeComboValues.DELETE

@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch
 from pathlib import Path 
 from PyQt6 import QtWidgets
 import sys
@@ -88,7 +89,50 @@ class TestCreateWindow(unittest.TestCase):
         window.origin_input.setText("  ")
         self.assertEqual(window.form_is_valid(), False)
     
+    @patch("platform.system", return_value="Darwin")
+    def test_path_is_valid_valid_macos(self, _):
+        window = CreateWindow(MainWindow())
+        self.assertTrue(window.path_is_valid("/Users/test"))
 
+    @patch("platform.system", return_value="Darwin")
+    def test_path_is_valid_filepath_macos(self, _):
+        window = CreateWindow(MainWindow())
+        self.assertFalse(window.path_is_valid("/Users/test.txt"))
+
+    @patch("platform.system", return_value="Darwin")
+    def test_path_is_valid_invalid_macos(self, _):
+        window = CreateWindow(MainWindow())
+        self.assertFalse(window.path_is_valid(":Users/"))
+
+    @patch("platform.system", return_value="Windows")
+    def test_path_is_valid_valid_windows(self, _):
+        window = CreateWindow(MainWindow())
+        self.assertTrue(window.path_is_valid(r"C:\Users\test"))
+
+    @patch("platform.system", return_value="Windows")
+    def test_path_is_valid_filepath_windows(self, _):
+        window = CreateWindow(MainWindow())
+        self.assertFalse(window.path_is_valid(r"C:\Users\test.txt"))
+
+    @patch("platform.system", return_value="Windows")
+    def test_path_is_valid_invalid_windows(self, _):
+        window = CreateWindow(MainWindow())
+        self.assertFalse(window.path_is_valid("C:Users/test"))
+
+    @patch("platform.system", return_value="Linux")
+    def test_path_is_valid_valid_linux(self, _):
+        window = CreateWindow(MainWindow())
+        self.assertTrue(window.path_is_valid("/home/test"))
+
+    @patch("platform.system", return_value="Linux")
+    def test_path_is_valid_filepath_linux(self, _):
+        window = CreateWindow(MainWindow())
+        self.assertFalse(window.path_is_valid("/home/test.txt"))
+
+    @patch("platform.system", return_value="Linux")
+    def test_path_is_valid_invalid_linux(self, _):
+        window = CreateWindow(MainWindow())
+        self.assertFalse(window.path_is_valid("home/test"))
 
 if __name__ == "__main__":
     unittest.main()
