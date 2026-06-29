@@ -134,5 +134,10 @@ class TestCreateWindow(unittest.TestCase):
         window = CreateWindow(MainWindow())
         self.assertFalse(window.path_is_valid("home/test"))
 
+    @patch("platform.system", return_value="Universal")
+    def test_path_is_valid_universal(self, _):
+        window = CreateWindow(MainWindow())
+        self.assertFalse(window.path_is_valid("home/test"))
+
 if __name__ == "__main__":
     unittest.main()
