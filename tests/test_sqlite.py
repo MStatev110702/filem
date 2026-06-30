@@ -17,10 +17,10 @@ class TestSqlite(unittest.TestCase):
             originpath="/filemanager",
             destpath="/filemanager/ui",
             include_dir="none",
-            include_files="none",
-            file_types=""
+            include_files="none"
         )
-        result = create_entry(test_entry)
+        file_types=["png", "pdf"]
+        result = create_entry(test_entry, file_types)
 
         self.assertTrue(result)
 
@@ -39,9 +39,8 @@ class TestSqlite(unittest.TestCase):
             destpath="/filemanager/ui",
             include_dir="none",
             include_files="none",
-            file_types=""
         )
-        result = create_entry(test_entry)
+        result = create_entry(test_entry, [])
 
         self.assertFalse(result)
 
@@ -69,10 +68,9 @@ class TestSqlite(unittest.TestCase):
             destpath="/filemanager/ui",
             include_dir="none",
             include_files="none",
-            file_types=""
         )
 
-        result = create_entry(test_entry)
+        result = create_entry(test_entry, [])
 
         self.assertFalse(result)
 

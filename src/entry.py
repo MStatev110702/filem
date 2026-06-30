@@ -13,4 +13,3 @@ class Entry:
     destpath: str
     include_dir: str
     include_files: str
-    file_types: str

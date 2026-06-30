@@ -1,11 +1,12 @@
 from PyQt6 import QtCore
+from .sqlite import get_file_types
 
 class TypeListModel(QtCore.QAbstractListModel):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.types = self._load()
-
-    def _load(self) -> list:
+    def __init__(self, file_types: list[str]=[]):
+        super().__init__()
+        self.types = file_types
+        
+    def _load(self) -> list[str]:
         return []
 
     def data(self, index:QtCore.QModelIndex, role: int) -> any:
@@ -27,5 +28,7 @@ class TypeListModel(QtCore.QAbstractListModel):
             self.types.pop(index)
             self.endRemoveRows()
         except IndexError:
-            return
-        
+            return   
+
+    def get_data(self) -> list[str]:
+        return list(self.types)

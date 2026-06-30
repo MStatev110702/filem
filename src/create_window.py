@@ -4,7 +4,7 @@ import platform
 from pathlib import Path
 from pathvalidate import is_valid_filepath
 from .error_window import ErrorWindow
-from .sqlite import create_entry, edit_entry
+from .sqlite import create_entry, edit_entry, get_file_types, edit_file_types
 from .entry import Entry
 from .create_window_enums import TypeComboValues, IntervalTypeComboValues
 from .type_list_model import TypeListModel
@@ -12,10 +12,10 @@ from .type_list_model import TypeListModel
 class CreateWindow(QtWidgets.QWidget):
     def __init__(self, parent:QtWidgets.QWidget, row: Entry|None=None) -> None:
         super().__init__()
-        self.init_ui()
         self.parent = parent
         self.mode = "create" if not row else "edit"
         self.row = row
+        self.init_ui()
         self.required_fields = [self.name_input, self.origin_input]
         self.main_manual_radio.click()
         if self.mode == "edit":
@@ -256,7 +256,7 @@ class CreateWindow(QtWidgets.QWidget):
         self.type_list = QtWidgets.QListView(self.files_tab)
         self.type_list.setObjectName("type_list")
         
-        self.type_list_model = TypeListModel()
+        self.type_list_model = TypeListModel() if self.mode == "create" else TypeListModel(get_file_types(self.row.id))
         self.type_list.setModel(self.type_list_model)
         self.type_list.doubleClicked.connect(self.remove_type)
 
@@ -362,7 +362,7 @@ class CreateWindow(QtWidgets.QWidget):
         dest_valid = self.path_is_valid(dest_path)
         origin_valid = self.path_is_valid(origin_path)
 
-        if not dest_valid or not origin_valid:
+        if (not dest_valid and self.desc_input in self.required_fields) or not origin_valid:
             invalid_paths = []
 
             if not origin_valid:
@@ -377,7 +377,6 @@ class CreateWindow(QtWidgets.QWidget):
         schedule_value = 0
         schedule_type = ""
         destpath = ""
-        file_types = ""
 
         main_group = self.main_radio_group.checkedButton().text() 
 
@@ -403,14 +402,14 @@ class CreateWindow(QtWidgets.QWidget):
             destpath=destpath,
             include_dir=self.dir_btn_group.checkedButton().text(),
             include_files=self.files_btn_group.checkedButton().text(),
-            file_types=file_types
         )
+        file_types=self.type_list_model.get_data()
 
         if self.mode == "create":
-            success = create_entry(entry) 
+            success = create_entry(entry, file_types) 
         else: 
             entry.id = self.row.id
-            success = edit_entry(entry)
+            success = edit_entry(entry) and edit_file_types(self.row.id, file_types)
 
         if not success:
             ErrorWindow("Something went wrong while saving the entry.").exec()
@@ -492,10 +491,11 @@ class CreateWindow(QtWidgets.QWidget):
             self.dest_input.setText(file_dialog)
 
     def add_type_to_list(self) -> None:
-        value = self.files_combo.currentText().strip()
+        value = self.files_combo.currentText().strip().lower()
         model = self.type_list_model
         if value not in model.types and value != "":
             model.add(value)
+            self.files_combo.setCurrentText("")
     
     def remove_type(self, index: QtCore.QModelIndex) -> None:
         self.type_list_model.delete(index.row())

@@ -47,5 +47,5 @@ class TableModel(QtCore.QAbstractTableModel):
         self._data = get_all_entries(name)
         self.endResetModel()
     
-    def get_row_id(self, index):
+    def get_row_id(self, index) -> int:
         return self._data[index.row()][0]
