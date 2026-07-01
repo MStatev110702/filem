@@ -121,6 +121,7 @@ def get_all_entries(name: str = "") -> List[Tuple]:
 def get_selected_entry(id: int) -> Entry|None:
     try:
         with sqlite3.connect(DB_FILE) as conn:
+            conn.row_factory = sqlite3.Row
             cursor = conn.cursor()
 
             if not tables_exist(cursor):
@@ -135,7 +136,12 @@ def get_selected_entry(id: int) -> Entry|None:
 
             cursor.execute(sql, (id,))
             row = cursor.fetchone()
-            return Entry(*row)
+            
+            if row == None:
+                print("No entry found")
+                return None
+
+            return Entry.from_row(row)
         
     except sqlite3.DatabaseError as e:
         print("Failed to execute query:", e)
