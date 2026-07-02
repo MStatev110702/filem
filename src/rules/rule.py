@@ -1,7 +1,7 @@
 from pathlib import Path
 from abc import ABC, abstractmethod
 
-class rule(ABC):
+class Rule(ABC):
     @abstractmethod
     def match(self, path: Path) -> bool:
-        ...
+        raise NotImplementedError

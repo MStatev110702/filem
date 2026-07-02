@@ -127,6 +127,7 @@ class CreateWindow(QtWidgets.QWidget):
         self.day_month_spin = QtWidgets.QSpinBox()
         self.day_month_spin.setObjectName("day_month_spin")
         self.day_month_spin.setMinimum(1)
+        self.day_month_spin.setMaximum(31)
 
         self.time_label = QtWidgets.QLabel()
         self.time_label.setObjectName("time_label")
@@ -448,6 +449,7 @@ class CreateWindow(QtWidgets.QWidget):
             return False
         
         return is_valid_filepath(path, platform=user_platform)
+
     def type_combo_changed(self) -> None:
         value = self.type_combo.currentData()
         enabled = value != TypeComboValues.DELETE
@@ -491,16 +493,20 @@ class CreateWindow(QtWidgets.QWidget):
             self.dest_input.setText(file_dialog)
 
     def add_type_to_list(self) -> None:
-        value = self.files_combo.currentText().strip().lower()
+        value = self.files_combo.currentText().strip().lower().replace(" ", "")
         model = self.type_list_model
-        if value not in model.types and value != "":
+        
+        if not value.startswith(".") and value != "":
+            value = "." + value
+
+        if value not in model.types:
             model.add(value)
             self.files_combo.setCurrentText("")
     
     def remove_type(self, index: QtCore.QModelIndex) -> None:
         self.type_list_model.delete(index.row())
 
-    def set_combo_value(self, combobox: QtWidgets.QComboBox, value: type[Enum]) -> None:      
+    def set_combo_value(self, combobox: QtWidgets.QComboBox, value: type[Enum]) -> None:
         index = combobox.findData(value)
 
         if index != -1:
@@ -531,5 +537,3 @@ class CreateWindow(QtWidgets.QWidget):
 
         self.set_radio_by_text(self.dir_btn_group, self.row.include_dir.strip())
         self.set_radio_by_text(self.files_btn_group, self.row.include_files.strip())
-
-                
