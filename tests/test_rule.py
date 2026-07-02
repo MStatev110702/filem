@@ -8,7 +8,7 @@ from src.entry import Entry
 
 class TestRule(unittest.TestCase):
     #--- file rules test ---
-    #--- allfiles ---
+    #--- all files ---
     def test_all_files_is_file(self):
         with tempfile.TemporaryDirectory() as tmp:
             test_file = Path(tmp) / "test.txt"
@@ -150,6 +150,73 @@ class TestRule(unittest.TestCase):
             rule = ExcludeTypes(include_types)
             self.assertFalse(rule.match(test_file))
 
+    #--- dir rules ---
+    #--- all dirs ---
+    def test_all_dirs_is_dir(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            test_dir = Path(tmp)
+
+            rule = AllDirs()
+            self.assertTrue(rule.match(test_dir))
+
+    def test_all_dirs_is_file(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            test_dir = Path(tmp) / "test.txt"
+            test_dir.write_text("test")
+
+            rule = AllDirs()
+            self.assertFalse(rule.match(test_dir))
+
+    #--- empty dirs ---
+    def test_empty_dirs_empty(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            test_dir = Path(tmp)
+
+            rule = EmptyDirs()
+            self.assertTrue(rule.match(test_dir))
+
+    def test_empty_dirs_is_file(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            test_dir = Path(tmp) / "test.txt"
+            test_dir.write_text("test")
+
+            rule = EmptyDirs()
+            self.assertFalse(rule.match(test_dir))
+
+    def test_empty_dirs_filled(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            test_dir = Path(tmp)
+            (test_dir / "test.txt").write_text("test")
+
+            rule = EmptyDirs()
+            self.assertFalse(rule.match(test_dir))
+
+    #--- filled dirs
+    def test_filled_dirs_filled(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            test_dir = Path(tmp)
+            (test_dir / "test.txt").write_text("test")
+
+            rule = FilledDirs()
+            self.assertTrue(rule.match(test_dir))
+
+    def test_filled_dirs_is_file(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            test_dir = Path(tmp) / "test.txt"
+            test_dir.write_text("test")
+
+            rule = FilledDirs()
+            self.assertFalse(rule.match(test_dir))
+
+    def test_filled_dirs_empty(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            test_dir = Path(tmp)
+
+            rule = FilledDirs()
+            self.assertFalse(rule.match(test_dir))
+
+
+    #--- factory ---
     def test_rule_factory_no_dir_rule(self):
         entry = Entry(
             id=1,
@@ -208,6 +275,26 @@ class TestRule(unittest.TestCase):
 
         self.assertIsInstance(rule.dir_rule, EmptyDirs)
         self.assertIsInstance(rule.file_rule, ExcludeTypes)
+
+    def test_rule_factory_both_none(self):
+        entry = Entry(
+            id=1,
+            name="test",
+            description="test",
+            type="COPY",
+            interval_type="newest",
+            schedule_type="",
+            schedule_value=0,
+            originpath="/tmp",
+            destpath="/tmp2",
+            include_dir="none",
+            include_files="none"
+        )
+        file_types = [".txt", ".pdf"]
+        rule = RuleFactory().create(entry, file_types)
+
+        self.assertIsNone(rule.dir_rule)
+        self.assertIsNone(rule.file_rule)
 
 if __name__ == "__main__":
     unittest.main()
