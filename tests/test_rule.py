@@ -3,7 +3,7 @@ from pathlib import Path
 import tempfile
 from src.rules.file_rules import AllFiles, IncludeTypes, ExcludeTypes
 from src.rules.dir_rules import AllDirs, EmptyDirs, FilledDirs
-from src.rules.factory import RuleFactory
+from src.rules.rule_factory import RuleFactory
 from src.entry import Entry
 
 class TestRule(unittest.TestCase):
