@@ -2,7 +2,8 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 from .create_window import CreateWindow
 from .error_window import ErrorWindow
 from .table_model import TableModel
-from .sqlite import delete_entry, get_selected_entry
+from .database.queries import db_call, get_selected_entry, delete_entry
+from .entry import Entry
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -105,9 +106,9 @@ class MainWindow(QtWidgets.QMainWindow):
             return
 
         row_id = self.model.get_row_id(index)
-
-        if not delete_entry(row_id):
-            ErrorWindow(f"There was an error while trying to delete the entry with the id: {row_id}").exec()
+        result = db_call(delete_entry, row_id)
+        if not result.get("success"):
+            ErrorWindow(f"There was an error while trying to delete the entry with the id: {result.get("error")}").exec()
             return
         
         self.search_entries()
@@ -124,11 +125,13 @@ class MainWindow(QtWidgets.QMainWindow):
             return
         
         row_id = self.model.get_row_id(index)
-        entry = get_selected_entry(row_id)
+        result = db_call(get_selected_entry, row_id)
 
-        if not entry:
-            ErrorWindow(f"Failed to retieve the entry with the id: {row_id}").exec()
+        if not result.get("success"):
+            ErrorWindow(f"Failed to retrieve the entry with the id: {row_id}").exec()
             return
+
+        entry = Entry.from_row(result.get("data"))
         
         self.window = CreateWindow(self, entry)
         self.window.setWindowModality(QtCore.Qt.WindowModality.ApplicationModal)

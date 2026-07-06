@@ -1,6 +1,7 @@
 from PyQt6 import QtCore
 from PyQt6.QtCore import Qt
-from .sqlite import get_all_entries
+from .database.queries import db_call, get_all_entries
+from .error_window import ErrorWindow
 
 class TableModel(QtCore.QAbstractTableModel):
     def __init__(self):
@@ -44,8 +45,13 @@ class TableModel(QtCore.QAbstractTableModel):
 
     def load(self, name: str = ""):
         self.beginResetModel()
-        self._data = get_all_entries(name)
+        result = db_call(get_all_entries, name)
+        if not result.get("success"):
+            ErrorWindow(f"Error while retrieving database entries:\n{result.get("error")}").exec()
+        else:
+            self._data = result.get("data")    
         self.endResetModel()
+            
     
     def get_row_id(self, index) -> int:
         return self._data[index.row()][0]

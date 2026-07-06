@@ -1,5 +1,4 @@
 from PyQt6 import QtCore
-from .sqlite import get_file_types
 
 class TypeListModel(QtCore.QAbstractListModel):
     def __init__(self, file_types: list[str]=[]):

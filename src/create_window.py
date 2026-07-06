@@ -4,7 +4,7 @@ import platform
 from pathlib import Path
 from pathvalidate import is_valid_filepath
 from .error_window import ErrorWindow
-from .sqlite import create_entry, edit_entry, get_file_types, edit_file_types
+from .database.queries import db_call, create_entry, edit_entry, get_file_types, edit_file_types, create_file_types
 from .entry import Entry
 from .create_window_enums import TypeComboValues, IntervalTypeComboValues
 from .type_list_model import TypeListModel
@@ -257,7 +257,18 @@ class CreateWindow(QtWidgets.QWidget):
         self.type_list = QtWidgets.QListView(self.files_tab)
         self.type_list.setObjectName("type_list")
         
-        self.type_list_model = TypeListModel() if self.mode == "create" else TypeListModel(get_file_types(self.row.id))
+        if self.mode == "create":
+            self.type_list_model = TypeListModel()
+        else:
+            file_type_result = db_call(get_file_types, self.row.id)
+            
+            if not file_type_result.get("success"):
+                ErrorWindow(f"Something went wrong while retrieving the file types.\n{file_type_result.get("error")}").exec()
+                return 
+            
+            print(file_type_result.get("data"))
+            self.type_list_model = TypeListModel(file_type_result.get("data"))
+
         self.type_list.setModel(self.type_list_model)
         self.type_list.doubleClicked.connect(self.remove_type)
 
@@ -407,14 +418,30 @@ class CreateWindow(QtWidgets.QWidget):
         file_types=self.type_list_model.get_data()
 
         if self.mode == "create":
-            success = create_entry(entry, file_types) 
+            result = db_call(create_entry, entry)
+
+            if not result.get("success"):
+                ErrorWindow(f"Something went wrong while creating the entry.\n{result.get("error")}").exec()
+                return
+            
+            file_type_result = db_call(create_file_types, result.get("data"), file_types)
+
+            if not file_type_result.get("success"):
+                ErrorWindow(f"Something went wrong while creating the file types.\n{file_type_result.get("error")}").exec()
+                return 
         else: 
             entry.id = self.row.id
-            success = edit_entry(entry) and edit_file_types(self.row.id, file_types)
+            result = db_call(edit_entry, entry) 
 
-        if not success:
-            ErrorWindow("Something went wrong while saving the entry.").exec()
-            return 
+            if not result.get("success"):
+                ErrorWindow(f"Something went wrong while editing the entry.\n{result.get("error")}").exec()
+                return
+            
+            file_type_result = db_call(edit_file_types, self.row.id, file_types)
+
+            if not file_type_result.get("success"):
+                ErrorWindow(f"Something went wrong while editing the file types.\n{file_type_result.get("error")}").exec()
+                return 
 
         self.close_window()
         self.parent.model.load()

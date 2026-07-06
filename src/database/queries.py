@@ -1,0 +1,168 @@
+import sqlite3
+from .db import Database
+from .query_response import QueryResponse
+from ..entry import Entry
+
+def db_call(fn, *args, **kwargs) -> QueryResponse:
+    try:
+        return {
+            "success": True,
+            "data": fn(*args, **kwargs),
+        }
+    except sqlite3.DatabaseError as e:
+        return {
+            "success": False,
+            "error": f"Database error:\n{e}",
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "error": f"Unexpected error:\n{e}",
+        }
+    
+def get_db(db: Database|None) -> Database:
+    return db or Database("filemanager.db")
+
+def create_entry(entry: Entry, db: Database|None = None) -> int|None:
+    db = get_db(db)
+
+    with db:
+        sql = """
+            INSERT INTO entries(
+                name, description, type, interval_type, schedule_type, schedule_value,
+                originpath, destpath, include_dir, include_files, state
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """
+
+        db.execute(sql, (
+            entry.name,
+            entry.description,
+            entry.type,
+            entry.interval_type,
+            entry.schedule_type,
+            entry.schedule_value,
+            entry.originpath,
+            entry.destpath,
+            entry.include_dir,
+            entry.include_files,
+            0
+        ))
+
+        return db.getlastrowid()
+
+def create_file_types(id: int, file_types: list[str], db: Database|None = None, ) -> None:
+    db = get_db(db)
+
+    with db:
+        file_types_sql = """
+            INSERT INTO file_types (entry_id, file_type)
+            VALUES (?, ?)
+        """
+            
+        db.executemany(file_types_sql, [(id, ft) for ft in file_types])
+    
+def get_all_entries(name: str = "", db: Database|None = None) -> list:
+    db = get_db(db)
+
+    with db:
+        sql = """
+            SELECT e.id, e.name, e.description, e.type, e.interval_type, e.schedule_type, e.schedule_value,
+                    e.originpath, e.destpath, e.include_dir, e.include_files, GROUP_CONCAT(ft.file_type, ', ') as file_types, e.state
+            FROM entries e
+            LEFT JOIN file_types ft ON e.id = ft.entry_id
+            GROUP BY e.id
+        """
+        params = ()
+
+        if name.strip() != "":
+            sql += "WHERE e.name like ?"
+            params = (f"%{name.strip()}%",)
+
+        return db.query(sql, params)
+
+def get_selected_entry(id: int, db: Database|None = None):
+    db = get_db(db)
+
+    with db:
+        sql = """
+            SELECT id, name, description, type, interval_type, schedule_type, schedule_value,
+                    originpath, destpath, include_dir, include_files
+            FROM entries 
+            Where id = ?
+        """
+
+        db.execute(sql, (id,))
+
+        return db.fetchone()
+    
+def get_file_types(id: int, db: Database|None = None) -> list:
+    db = get_db(db)
+    
+    with db:
+        sql = """
+            SELECT file_type
+            FROM file_types
+            WHERE entry_id = ?
+        """
+
+        return [r[0] for r in db.query(sql, (id,))]
+    
+def delete_entry(id: int, db: Database|None = None) -> None:
+    db = get_db(db)
+    
+    with db:
+        sql = """
+            DELETE FROM entries
+            WHERE id = ?
+        """
+        db.execute(sql, (id,))
+
+def delete_file_types(id: int, db: Database|None = None) -> None:
+    db = get_db(db)
+    with db:
+        sql = """
+            DELETE FROM file_types
+            WHERE entry_id = ?
+        """
+        
+        db.execute(sql, (id,))
+
+def edit_entry(entry:Entry, db: Database|None = None) -> None:
+    db = get_db(db)
+
+    with db:
+        sql = """
+            UPDATE entries
+            SET
+                name = ?, 
+                description = ?, 
+                type = ?,
+                interval_type = ?, 
+                schedule_type = ?,
+                schedule_value = ?,
+                originpath = ?, 
+                destpath = ?, 
+                include_dir = ?, 
+                include_files = ?
+            WHERE
+                id = ?
+        """
+
+        db.execute(sql, (
+            entry.name,
+            entry.description,
+            entry.type,
+            entry.interval_type,
+            entry.schedule_type,
+            entry.schedule_value,
+            entry.originpath,
+            entry.destpath,
+            entry.include_dir,
+            entry.include_files,
+            entry.id
+        ))
+
+def edit_file_types(id: int, file_types: list) -> None:
+    delete_file_types(id)
+    create_file_types(id, file_types)
