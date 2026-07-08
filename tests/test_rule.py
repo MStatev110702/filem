@@ -1,12 +1,12 @@
 import unittest
 from pathlib import Path
 import tempfile
+from base_test import BaseTest
 from src.rules.file_rules import AllFiles, IncludeTypes, ExcludeTypes
 from src.rules.dir_rules import AllDirs, EmptyDirs, FilledDirs
 from src.rules.rule_factory import RuleFactory
-from src.entry import Entry
 
-class TestRule(unittest.TestCase):
+class TestRule(BaseTest):
     #--- file rules test ---
     #--- all files ---
     def test_all_files_is_file(self):
@@ -218,80 +218,48 @@ class TestRule(unittest.TestCase):
 
     #--- factory ---
     def test_rule_factory_no_dir_rule(self):
-        entry = Entry(
-            id=1,
-            name="test",
-            description="test",
-            type="COPY",
-            interval_type="newest",
-            schedule_type="",
-            schedule_value=0,
-            originpath="/tmp",
-            destpath="/tmp2",
+        test_entry = self.create_test_entry(
             include_dir="none",
             include_files="selected types"
         )
+
         file_types = [".txt", ".pdf"]
-        rule = RuleFactory().create(entry, file_types)
+        rule = RuleFactory().create(test_entry, file_types)
 
         self.assertIsNone(rule.dir_rule)
         self.assertIsInstance(rule.file_rule, IncludeTypes)
 
     def test_rule_factory_no_file_rule(self):
-        entry = Entry(
-            id=1,
-            name="test",
-            description="test",
-            type="COPY",
-            interval_type="newest",
-            schedule_type="",
-            schedule_value=0,
-            originpath="/tmp",
-            destpath="/tmp2",
+        test_entry = self.create_test_entry(
             include_dir="all",
             include_files="none"
         )
-        rule = RuleFactory().create(entry, [])
+
+        rule = RuleFactory().create(test_entry, [])
 
         self.assertIsNone(rule.file_rule)
         self.assertIsInstance(rule.dir_rule, AllDirs)
 
     def test_rule_factory_both(self):
-        entry = Entry(
-            id=1,
-            name="test",
-            description="test",
-            type="COPY",
-            interval_type="newest",
-            schedule_type="",
-            schedule_value=0,
-            originpath="/tmp",
-            destpath="/tmp2",
+        test_entry = self.create_test_entry(
             include_dir="empty",
             include_files="exclude types"
         )
+
         file_types = [".txt", ".pdf"]
-        rule = RuleFactory().create(entry, file_types)
+        rule = RuleFactory().create(test_entry, file_types)
 
         self.assertIsInstance(rule.dir_rule, EmptyDirs)
         self.assertIsInstance(rule.file_rule, ExcludeTypes)
 
     def test_rule_factory_both_none(self):
-        entry = Entry(
-            id=1,
-            name="test",
-            description="test",
-            type="COPY",
-            interval_type="newest",
-            schedule_type="",
-            schedule_value=0,
-            originpath="/tmp",
-            destpath="/tmp2",
-            include_dir="none",
+        test_entry = self.create_test_entry(
+            include_dir="none", 
             include_files="none"
         )
+
         file_types = [".txt", ".pdf"]
-        rule = RuleFactory().create(entry, file_types)
+        rule = RuleFactory().create(test_entry, file_types)
 
         self.assertIsNone(rule.dir_rule)
         self.assertIsNone(rule.file_rule)

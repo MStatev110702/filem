@@ -3,12 +3,13 @@ import tempfile
 import random
 import string
 from pathlib import Path
+from base_test import BaseTest
 from src.entry import Entry
 from src.action.file_actions import CopyFile, MoveFile, DeleteFile
 from src.action.dir_actions import CopyDir, MoveDir, DeleteDir
 from src.action.action_factory import ActionFactory
 
-class TestAction(unittest.TestCase):
+class TestAction(BaseTest):
     #--- factory tests---
     def test_action_factory_copy_file(self):
        with tempfile.TemporaryDirectory() as tmp:
@@ -17,18 +18,9 @@ class TestAction(unittest.TestCase):
             dest_dir = Path(tmp) / "destination"
             dest_dir.mkdir()
 
-            test_entry = Entry(
-                id=1,
-                name="test",
-                description="test",
+            test_entry = self.create_test_entry(
                 type="COPY",
-                interval_type="newest",
-                schedule_type="",
-                schedule_value=0,
-                originpath=str(tmp),
-                destpath=str(dest_dir),
-                include_dir="none",
-                include_files="none"
+                destpath=str(dest_dir)
             )
 
             action = ActionFactory().create(test_entry, test_file)
@@ -41,18 +33,9 @@ class TestAction(unittest.TestCase):
             dest_dir = Path(tmp) / "destination"
             dest_dir.mkdir()
 
-            test_entry = Entry(
-                id=1,
-                name="test",
-                description="test",
+            test_entry = self.create_test_entry(
                 type="MOVE",
-                interval_type="newest",
-                schedule_type="",
-                schedule_value=0,
-                originpath=str(tmp),
-                destpath=str(dest_dir),
-                include_dir="none",
-                include_files="none"
+                destpath=str(dest_dir)
             )
 
             action = ActionFactory().create(test_entry, test_file)
@@ -63,18 +46,8 @@ class TestAction(unittest.TestCase):
             test_file = Path(tmp) / "test.txt"
             test_file.write_text("Hello")
 
-            test_entry = Entry(
-                id=1,
-                name="test",
-                description="test",
-                type="DELETE",
-                interval_type="newest",
-                schedule_type="",
-                schedule_value=0,
-                originpath=str(tmp),
-                destpath="",
-                include_dir="none",
-                include_files="none"
+            test_entry = self.create_test_entry(
+                type="DELETE"
             )
 
             action = ActionFactory().create(test_entry, test_file)
@@ -87,18 +60,9 @@ class TestAction(unittest.TestCase):
             dest_dir = Path(tmp) / "destination"
             dest_dir.mkdir()      
 
-            test_entry = Entry(
-                id=1,
-                name="test",
-                description="test",
+            test_entry = self.create_test_entry(
                 type="COPY",
-                interval_type="newest",
-                schedule_type="",
-                schedule_value=0,
-                originpath=str(Path(tmp)),
-                destpath="   ",
-                include_dir="none",
-                include_files="none"
+                destpath="   "
             )
 
             with self.assertRaises(ValueError):
@@ -109,18 +73,9 @@ class TestAction(unittest.TestCase):
             test_file = Path(tmp) / "test.txt"
             test_file.write_text("Hello")
 
-            test_entry = Entry(
-                id=1,
-                name="test",
-                description="test",
+            test_entry = self.create_test_entry(
                 type="COPY",
-                interval_type="newest",
-                schedule_type="",
-                schedule_value=0,
-                originpath=str(tmp),
-                destpath="",
-                include_dir="none",
-                include_files="none"
+                destpath=""
             )
 
             with self.assertRaises(ValueError):
@@ -130,18 +85,9 @@ class TestAction(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             dest_dir = Path(tmp) / "destination"
 
-            test_entry = Entry(
-                id=1,
-                name="test",
-                description="test",
+            test_entry = self.create_test_entry(
                 type="COPY",
-                interval_type="newest",
-                schedule_type="",
-                schedule_value=0,
-                originpath="",
-                destpath=str(dest_dir),
-                include_dir="none",
-                include_files="none"
+                destpath=str(dest_dir)
             )
 
             with self.assertRaises(ValueError):
@@ -151,18 +97,9 @@ class TestAction(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             dest_dir = Path(tmp) / "destination"
 
-            test_entry = Entry(
-                id=1,
-                name="test",
-                description="test",
+            test_entry = self.create_test_entry(
                 type="COPY",
-                interval_type="newest",
-                schedule_type="",
-                schedule_value=0,
-                originpath=str(Path(tmp)),
-                destpath=str(dest_dir),
-                include_dir="none",
-                include_files="none"
+                destpath=str(dest_dir)
             )
 
             with self.assertRaises(FileExistsError):
@@ -175,18 +112,9 @@ class TestAction(unittest.TestCase):
             dest_dir = Path(tmp) / "destination"
             dest_dir.mkdir()
 
-            test_entry = Entry(
-                id=1,
-                name="test",
-                description="test",
+            test_entry = self.create_test_entry(
                 type="WHAT_IS_THIS",
-                interval_type="newest",
-                schedule_type="",
-                schedule_value=0,
-                originpath=str(tmp),
-                destpath=str(dest_dir),
-                include_dir="none",
-                include_files="none"
+                destpath=str(dest_dir)
             )
 
             with self.assertRaises(ValueError):
@@ -199,18 +127,9 @@ class TestAction(unittest.TestCase):
             dest_dir = Path(tmp) / "destination"
             dest_dir.mkdir()
 
-            test_entry = Entry(
-                id=1,
-                name="test",
-                description="test",
+            test_entry = self.create_test_entry(
                 type="WHAT_IS_THIS",
-                interval_type="newest",
-                schedule_type="",
-                schedule_value=0,
-                originpath=str(tmp),
-                destpath=str(dest_dir),
-                include_dir="none",
-                include_files="none"
+                destpath=str(dest_dir)
             )
 
             with self.assertRaises(ValueError):
