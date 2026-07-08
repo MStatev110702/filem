@@ -23,16 +23,16 @@ def db_call(fn, *args, **kwargs) -> QueryResponse:
 def get_db(db: Database|None) -> Database:
     return db or Database("filemanager.db")
 
-def create_entry(entry: Entry, db: Database|None = None) -> int|None:
+def create_entry(entry: Entry, db: Database|None = None) -> int:
     db = get_db(db)
 
     with db:
         sql = """
             INSERT INTO entries(
                 name, description, type, interval_type, schedule_type, schedule_value,
-                originpath, destpath, include_dir, include_files, state
+                originpath, destpath, include_dir, include_files
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """
 
         db.execute(sql, (
@@ -46,38 +46,39 @@ def create_entry(entry: Entry, db: Database|None = None) -> int|None:
             entry.destpath,
             entry.include_dir,
             entry.include_files,
-            0
         ))
 
         return db.getlastrowid()
 
-def create_file_types(id: int, file_types: list[str], db: Database|None = None, ) -> None:
+def create_file_types(id: int, file_types: list[str], db: Database|None = None) -> None:
     db = get_db(db)
 
     with db:
-        file_types_sql = """
+        sql = """
             INSERT INTO file_types (entry_id, file_type)
             VALUES (?, ?)
         """
             
-        db.executemany(file_types_sql, [(id, ft) for ft in file_types])
+        db.executemany(sql, [(id, ft) for ft in file_types])
     
 def get_all_entries(name: str = "", db: Database|None = None) -> list:
     db = get_db(db)
 
     with db:
-        sql = """
+        where_part = ""
+        params = ()
+        if name.strip() != "":
+            where_part += "and e.name like ?"
+            params = (f"%{name.strip()}%",)
+
+        sql = f"""
             SELECT e.id, e.name, e.description, e.type, e.interval_type, e.schedule_type, e.schedule_value,
-                    e.originpath, e.destpath, e.include_dir, e.include_files, GROUP_CONCAT(ft.file_type, ', ') as file_types, e.state
+                    e.originpath, e.destpath, e.include_dir, e.include_files, GROUP_CONCAT(ft.file_type, ', ' ORDER BY ft.file_type) as file_types, e.state
             FROM entries e
             LEFT JOIN file_types ft ON e.id = ft.entry_id
+            WHERE 1=1 {where_part}
             GROUP BY e.id
         """
-        params = ()
-
-        if name.strip() != "":
-            sql += "WHERE e.name like ?"
-            params = (f"%{name.strip()}%",)
 
         return db.query(sql, params)
 
@@ -104,9 +105,10 @@ def get_file_types(id: int, db: Database|None = None) -> list:
             SELECT file_type
             FROM file_types
             WHERE entry_id = ?
+            ORDER BY file_type
         """
 
-        return [r[0] for r in db.query(sql, (id,))]
+        return db.query(sql, (id,))
     
 def delete_entry(id: int, db: Database|None = None) -> None:
     db = get_db(db)

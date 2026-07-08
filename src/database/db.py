@@ -6,7 +6,7 @@ DATA_PATH = Path(__file__).resolve().parent.parent.parent / "data"
 DATA_PATH.mkdir(exist_ok=True)
 
 class Database:
-    def __init__(self, name: str,conn: sqlite3.Connection|None=None):
+    def __init__(self, name: str = "", conn: sqlite3.Connection|None=None):
         self._conn = conn or sqlite3.connect(DATA_PATH / name)
         self._conn.row_factory = sqlite3.Row
         self._cursor = self._conn.cursor()
@@ -62,7 +62,7 @@ class Database:
             """CREATE TABLE IF NOT EXISTS entries (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
-                description TEXT NOT NULL,
+                description TEXT,
                 type TEXT NOT NULL,
                 interval_type TEXT NOT NULL,
                 schedule_type TEXT,
@@ -72,11 +72,13 @@ class Database:
                 include_dir TEXT NOT NULL,
                 include_files TEXT NOT NULL,
                 last_run DATE,
-                state INTEGER
+                state INTEGER DEFAULT 0
             );""",
             """CREATE TABLE IF NOT EXISTS file_types (
-                entry_id INTEGER,
-                file_type TEXT
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                entry_id INTEGER NOT NULL,
+                file_type TEXT NOT NULL,
+                FOREIGN KEY (entry_id) REFERENCES entries (id)
             );"""
         ]
 
