@@ -9,8 +9,11 @@ class ActionFactory():
     def create(entry: Entry, src: Path) -> Action:
         dest = entry.destpath.strip()
 
-        if dest == "" and entry.type in ("COPY", "MOVE"):
-            raise ValueError("The destination should'nt be empty if the type is COPY or MOVE")
+        if entry.type in ("COPY", "MOVE"):
+            if dest == "":
+                raise ValueError("The destination should'nt be empty if the type is COPY or MOVE")
+            elif dest.startswith("."):
+                raise ValueError("The paths should'nt be relative")
         
         if str(src).startswith("."):
             raise ValueError("The paths should'nt be relative")

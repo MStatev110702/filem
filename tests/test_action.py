@@ -9,7 +9,77 @@ from src.action.dir_actions import CopyDir, MoveDir, DeleteDir
 from src.action.action_factory import ActionFactory
 
 class TestAction(unittest.TestCase):
-    #--- factory errors ---
+    #--- factory tests---
+    def test_action_factory_copy_file(self):
+       with tempfile.TemporaryDirectory() as tmp:
+            test_file = Path(tmp) / "test.txt"
+            test_file.write_text("Hello")
+            dest_dir = Path(tmp) / "destination"
+            dest_dir.mkdir()
+
+            test_entry = Entry(
+                id=1,
+                name="test",
+                description="test",
+                type="COPY",
+                interval_type="newest",
+                schedule_type="",
+                schedule_value=0,
+                originpath=str(tmp),
+                destpath=str(dest_dir),
+                include_dir="none",
+                include_files="none"
+            )
+
+            action = ActionFactory().create(test_entry, test_file)
+            self.assertIsInstance(action, CopyFile) 
+
+    def test_action_factory_move_file(self):
+       with tempfile.TemporaryDirectory() as tmp:
+            test_file = Path(tmp) / "test.txt"
+            test_file.write_text("Hello")
+            dest_dir = Path(tmp) / "destination"
+            dest_dir.mkdir()
+
+            test_entry = Entry(
+                id=1,
+                name="test",
+                description="test",
+                type="MOVE",
+                interval_type="newest",
+                schedule_type="",
+                schedule_value=0,
+                originpath=str(tmp),
+                destpath=str(dest_dir),
+                include_dir="none",
+                include_files="none"
+            )
+
+            action = ActionFactory().create(test_entry, test_file)
+            self.assertIsInstance(action, MoveFile)
+
+    def test_action_factory_delete_file(self):
+       with tempfile.TemporaryDirectory() as tmp:
+            test_file = Path(tmp) / "test.txt"
+            test_file.write_text("Hello")
+
+            test_entry = Entry(
+                id=1,
+                name="test",
+                description="test",
+                type="DELETE",
+                interval_type="newest",
+                schedule_type="",
+                schedule_value=0,
+                originpath=str(tmp),
+                destpath="",
+                include_dir="none",
+                include_files="none"
+            )
+
+            action = ActionFactory().create(test_entry, test_file)
+            self.assertIsInstance(action, DeleteFile)
+
     def test_action_factory_dest_empty_spaces(self):
         with tempfile.TemporaryDirectory() as tmp:
             test_file = Path(tmp) / "test.txt"
@@ -155,30 +225,13 @@ class TestAction(unittest.TestCase):
             dest_dir = Path(tmp) / "destination"
             dest_dir.mkdir()
 
-            test_entry = Entry(
-                id=1,
-                name="test",
-                description="test",
-                type="COPY",
-                interval_type="newest",
-                schedule_type="",
-                schedule_value=0,
-                originpath=str(tmp),
-                destpath=str(dest_dir),
-                include_dir="none",
-                include_files="none"
-            )
-
-            action = ActionFactory().create(test_entry, test_file)
-            action.execute()
+            CopyFile(test_file, dest_dir).execute()
             
             dest_file = dest_dir / "test.txt"
-            self.assertIsInstance(action, CopyFile)
+
             self.assertTrue(test_file.exists())
             self.assertTrue(dest_file.exists())
-            
-            if dest_file.exists:
-                self.assertEqual(dest_file.read_text().rstrip(), "Hello")
+            self.assertEqual(dest_file.read_text().rstrip(), "Hello")
 
     def test_copy_file_dest_not_exists(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -186,31 +239,13 @@ class TestAction(unittest.TestCase):
             test_file.write_text("Hello")
             dest_dir = Path(tmp) / "destination"
 
-            test_entry = Entry(
-                id=1,
-                name="test",
-                description="test",
-                type="COPY",
-                interval_type="newest",
-                schedule_type="",
-                schedule_value=0,
-                originpath=str(tmp),
-                destpath=str(dest_dir),
-                include_dir="none",
-                include_files="none"
-            )
-
-            action = ActionFactory().create(test_entry, test_file)
-            action.execute()
+            CopyFile(test_file, dest_dir).execute()
             
             dest_file = dest_dir / "test.txt"
-            self.assertIsInstance(action, CopyFile)
+
             self.assertTrue(test_file.exists())
             self.assertTrue(dest_file.exists())
-            
-
-            if dest_file.exists():
-                self.assertEqual(dest_file.read_text().rstrip(), "Hello")
+            self.assertEqual(dest_file.read_text().rstrip(), "Hello")
 
     def test_copy_file_auto_rename(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -221,30 +256,13 @@ class TestAction(unittest.TestCase):
             existsing_file = dest_dir / "test.txt"
             existsing_file.write_text("test123")         
 
-            test_entry = Entry(
-                id=1,
-                name="test",
-                description="test",
-                type="COPY",
-                interval_type="newest",
-                schedule_type="",
-                schedule_value=0,
-                originpath=str(tmp),
-                destpath=str(dest_dir),
-                include_dir="none",
-                include_files="none"
-            )
-
-            action = ActionFactory().create(test_entry, test_file)
-            action.execute()
+            CopyFile(test_file, dest_dir).execute()
             
             dest_file = dest_dir / "test (1).txt"
-            self.assertIsInstance(action, CopyFile)
+
             self.assertTrue(test_file.exists())
             self.assertTrue(dest_file.exists())
-
-            if dest_file.exists():
-                self.assertEqual(dest_file.read_text().rstrip(), "Hello")
+            self.assertEqual(dest_file.read_text().rstrip(), "Hello")
 
     def test_copy_file_auto_rename_multiple(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -259,30 +277,13 @@ class TestAction(unittest.TestCase):
             existsing_file_2 = dest_dir / "test (2).txt"
             existsing_file_2.write_text("test123")         
 
-            test_entry = Entry(
-                id=1,
-                name="test",
-                description="test",
-                type="COPY",
-                interval_type="newest",
-                schedule_type="",
-                schedule_value=0,
-                originpath=str(tmp),
-                destpath=str(dest_dir),
-                include_dir="none",
-                include_files="none"
-            )
-
-            action = ActionFactory().create(test_entry, test_file)
-            action.execute()
+            CopyFile(test_file, dest_dir).execute()
             
             dest_file = dest_dir / "test (3).txt"
-            self.assertIsInstance(action, CopyFile)
+
             self.assertTrue(test_file.exists())
             self.assertTrue(dest_file.exists())
-
-            if dest_file.exists():
-                self.assertEqual(dest_file.read_text().rstrip(), "Hello")
+            self.assertEqual(dest_file.read_text().rstrip(), "Hello")
 
     def test_copy_file_deep_nest(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -291,32 +292,15 @@ class TestAction(unittest.TestCase):
             test_file = test_src_dir / "test.txt"
             test_file.write_text("Hello")
             dest_dir = Path(tmp) / "destination"
-            dest_dir.mkdir()      
+            dest_dir.mkdir()
 
-            test_entry = Entry(
-                id=1,
-                name="test",
-                description="test",
-                type="COPY",
-                interval_type="newest",
-                schedule_type="",
-                schedule_value=0,
-                originpath=str(test_src_dir),
-                destpath=str(dest_dir),
-                include_dir="none",
-                include_files="none"
-            )
-
-            action = ActionFactory().create(test_entry, test_file)
-            action.execute()
+            CopyFile(test_file, dest_dir).execute()
             
             dest_file = dest_dir / "test.txt"
-            self.assertIsInstance(action, CopyFile)
+
             self.assertTrue(test_file.exists())
             self.assertTrue(dest_file.exists())
-
-            if dest_file.exists():
-                self.assertEqual(dest_file.read_text().rstrip(), "Hello")
+            self.assertEqual(dest_file.read_text().rstrip(), "Hello")
 
     def test_copy_file_empty_file(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -325,30 +309,13 @@ class TestAction(unittest.TestCase):
             dest_dir = Path(tmp) / "destination"
             dest_dir.mkdir()      
 
-            test_entry = Entry(
-                id=1,
-                name="test",
-                description="test",
-                type="COPY",
-                interval_type="newest",
-                schedule_type="",
-                schedule_value=0,
-                originpath=str(Path(tmp)),
-                destpath=str(dest_dir),
-                include_dir="none",
-                include_files="none"
-            )
+            CopyFile(test_file, dest_dir).execute()
 
-            action = ActionFactory().create(test_entry, test_file)
-            action.execute()
-            
             dest_file = dest_dir / "test.txt"
-            self.assertIsInstance(action, CopyFile)
+
             self.assertTrue(test_file.exists())
             self.assertTrue(dest_file.exists())
-
-            if dest_file.exists():
-                self.assertEqual(dest_file.read_text().rstrip(), "")
+            self.assertEqual(dest_file.read_text().rstrip(), "")
 
     def test_copy_file_byte_file(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -357,30 +324,13 @@ class TestAction(unittest.TestCase):
             dest_dir = Path(tmp) / "destination"
             dest_dir.mkdir()      
 
-            test_entry = Entry(
-                id=1,
-                name="test",
-                description="test",
-                type="COPY",
-                interval_type="newest",
-                schedule_type="",
-                schedule_value=0,
-                originpath=str(Path(tmp)),
-                destpath=str(dest_dir),
-                include_dir="none",
-                include_files="none"
-            )
-
-            action = ActionFactory().create(test_entry, test_file)
-            action.execute()
+            CopyFile(test_file, dest_dir).execute()
             
             dest_file = dest_dir / "test.txt"
-            self.assertIsInstance(action, CopyFile)
+
             self.assertTrue(test_file.exists())
             self.assertTrue(dest_file.exists())
-
-            if dest_file.exists():
-                self.assertEqual(dest_file.read_text().rstrip(), "\x00\x01\x02")
+            self.assertEqual(dest_file.read_text().rstrip(), "\x00\x01\x02")
 
     def test_copy_file_large_file(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -390,30 +340,13 @@ class TestAction(unittest.TestCase):
             dest_dir = Path(tmp) / "destination"
             dest_dir.mkdir()      
 
-            test_entry = Entry(
-                id=1,
-                name="test",
-                description="test",
-                type="COPY",
-                interval_type="newest",
-                schedule_type="",
-                schedule_value=0,
-                originpath=str(Path(tmp)),
-                destpath=str(dest_dir),
-                include_dir="none",
-                include_files="none"
-            )
-
-            action = ActionFactory().create(test_entry, test_file)
-            action.execute()
+            CopyFile(test_file, dest_dir).execute()
             
             dest_file = dest_dir / "test.txt"
-            self.assertIsInstance(action, CopyFile)
+
             self.assertTrue(test_file.exists())
             self.assertTrue(dest_file.exists())
-
-            if dest_file.exists():
-                self.assertEqual(dest_file.read_text().rstrip(), large_string)      
+            self.assertEqual(dest_file.read_text().rstrip(), large_string)      
     
     #--- move file action ---
     def test_move_file_default(self):
@@ -423,30 +356,13 @@ class TestAction(unittest.TestCase):
             dest_dir = Path(tmp) / "destination"
             dest_dir.mkdir()
 
-            test_entry = Entry(
-                id=1,
-                name="test",
-                description="test",
-                type="MOVE",
-                interval_type="newest",
-                schedule_type="",
-                schedule_value=0,
-                originpath=str(tmp),
-                destpath=str(dest_dir),
-                include_dir="none",
-                include_files="none"
-            )
-
-            action = ActionFactory().create(test_entry, test_file)
-            action.execute()
+            MoveFile(test_file, dest_dir).execute()
             
             dest_file = dest_dir / "test.txt"
-            self.assertIsInstance(action, MoveFile)
+
             self.assertTrue(not test_file.exists())
             self.assertTrue(dest_file.exists())
-            
-            if dest_file.exists:
-                self.assertEqual(dest_file.read_text().rstrip(), "Hello")
+            self.assertEqual(dest_file.read_text().rstrip(), "Hello")
 
     def test_move_file_dest_not_exists(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -454,30 +370,13 @@ class TestAction(unittest.TestCase):
             test_file.write_text("Hello")
             dest_dir = Path(tmp) / "destination"
 
-            test_entry = Entry(
-                id=1,
-                name="test",
-                description="test",
-                type="MOVE",
-                interval_type="newest",
-                schedule_type="",
-                schedule_value=0,
-                originpath=str(tmp),
-                destpath=str(dest_dir),
-                include_dir="none",
-                include_files="none"
-            )
-
-            action = ActionFactory().create(test_entry, test_file)
-            action.execute()
+            MoveFile(test_file, dest_dir).execute()
             
             dest_file = dest_dir / "test.txt"
-            self.assertIsInstance(action, MoveFile)
+
             self.assertTrue(not test_file.exists())
             self.assertTrue(dest_file.exists())
-
-            if dest_file.exists():
-                self.assertEqual(dest_file.read_text().rstrip(), "Hello")
+            self.assertEqual(dest_file.read_text().rstrip(), "Hello")
 
     def test_move_file_auto_rename(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -488,30 +387,13 @@ class TestAction(unittest.TestCase):
             existsing_file = dest_dir / "test.txt"
             existsing_file.write_text("test123")         
 
-            test_entry = Entry(
-                id=1,
-                name="test",
-                description="test",
-                type="MOVE",
-                interval_type="newest",
-                schedule_type="",
-                schedule_value=0,
-                originpath=str(tmp),
-                destpath=str(dest_dir),
-                include_dir="none",
-                include_files="none"
-            )
-
-            action = ActionFactory().create(test_entry, test_file)
-            action.execute()
+            MoveFile(test_file, dest_dir).execute()
             
             dest_file = dest_dir / "test (1).txt"
-            self.assertIsInstance(action, MoveFile)
+            
             self.assertTrue(not test_file.exists())
             self.assertTrue(dest_file.exists())
-
-            if dest_file.exists():
-                self.assertEqual(dest_file.read_text().rstrip(), "Hello")
+            self.assertEqual(dest_file.read_text().rstrip(), "Hello")
 
     def test_move_file_auto_rename_multiple(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -526,30 +408,13 @@ class TestAction(unittest.TestCase):
             existsing_file_2 = dest_dir / "test (2).txt"
             existsing_file_2.write_text("test123")         
 
-            test_entry = Entry(
-                id=1,
-                name="test",
-                description="test",
-                type="MOVE",
-                interval_type="newest",
-                schedule_type="",
-                schedule_value=0,
-                originpath=str(tmp),
-                destpath=str(dest_dir),
-                include_dir="none",
-                include_files="none"
-            )
-
-            action = ActionFactory().create(test_entry, test_file)
-            action.execute()
+            MoveFile(test_file, dest_dir).execute()
             
             dest_file = dest_dir / "test (3).txt"
-            self.assertIsInstance(action, MoveFile)
+            
             self.assertTrue(not test_file.exists())
             self.assertTrue(dest_file.exists())
-
-            if dest_file.exists():
-                self.assertEqual(dest_file.read_text().rstrip(), "Hello")
+            self.assertEqual(dest_file.read_text().rstrip(), "Hello")
 
     def test_move_file_deep_nest(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -560,30 +425,13 @@ class TestAction(unittest.TestCase):
             dest_dir = Path(tmp) / "destination"
             dest_dir.mkdir()      
 
-            test_entry = Entry(
-                id=1,
-                name="test",
-                description="test",
-                type="MOVE",
-                interval_type="newest",
-                schedule_type="",
-                schedule_value=0,
-                originpath=str(test_src_dir),
-                destpath=str(dest_dir),
-                include_dir="none",
-                include_files="none"
-            )
-
-            action = ActionFactory().create(test_entry, test_file)
-            action.execute()
+            MoveFile(test_file, dest_dir).execute()
             
             dest_file = dest_dir / "test.txt"
-            self.assertIsInstance(action, MoveFile)
+
             self.assertTrue(not test_file.exists())
             self.assertTrue(dest_file.exists())
-
-            if dest_file.exists():
-                self.assertEqual(dest_file.read_text().rstrip(), "Hello")
+            self.assertEqual(dest_file.read_text().rstrip(), "Hello")
 
     def test_move_file_empty_file(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -592,30 +440,13 @@ class TestAction(unittest.TestCase):
             dest_dir = Path(tmp) / "destination"
             dest_dir.mkdir()      
 
-            test_entry = Entry(
-                id=1,
-                name="test",
-                description="test",
-                type="MOVE",
-                interval_type="newest",
-                schedule_type="",
-                schedule_value=0,
-                originpath=str(Path(tmp)),
-                destpath=str(dest_dir),
-                include_dir="none",
-                include_files="none"
-            )
-
-            action = ActionFactory().create(test_entry, test_file)
-            action.execute()
+            MoveFile(test_file, dest_dir).execute()
             
             dest_file = dest_dir / "test.txt"
-            self.assertIsInstance(action, MoveFile)
+
             self.assertTrue(not test_file.exists())
             self.assertTrue(dest_file.exists())
-
-            if dest_file.exists():
-                self.assertEqual(dest_file.read_text().rstrip(), "")
+            self.assertEqual(dest_file.read_text().rstrip(), "")
 
     def test_move_file_byte_file(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -624,30 +455,13 @@ class TestAction(unittest.TestCase):
             dest_dir = Path(tmp) / "destination"
             dest_dir.mkdir()      
 
-            test_entry = Entry(
-                id=1,
-                name="test",
-                description="test",
-                type="MOVE",
-                interval_type="newest",
-                schedule_type="",
-                schedule_value=0,
-                originpath=str(Path(tmp)),
-                destpath=str(dest_dir),
-                include_dir="none",
-                include_files="none"
-            )
-
-            action = ActionFactory().create(test_entry, test_file)
-            action.execute()
+            MoveFile(test_file, dest_dir).execute()
             
             dest_file = dest_dir / "test.txt"
-            self.assertIsInstance(action, MoveFile)
+
             self.assertTrue(not test_file.exists())
             self.assertTrue(dest_file.exists())
-
-            if dest_file.exists():
-                self.assertEqual(dest_file.read_text().rstrip(), "\x00\x01\x02")
+            self.assertEqual(dest_file.read_text().rstrip(), "\x00\x01\x02")
 
     def test_move_file_large_file(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -657,30 +471,13 @@ class TestAction(unittest.TestCase):
             dest_dir = Path(tmp) / "destination"
             dest_dir.mkdir()      
 
-            test_entry = Entry(
-                id=1,
-                name="test",
-                description="test",
-                type="MOVE",
-                interval_type="newest",
-                schedule_type="",
-                schedule_value=0,
-                originpath=str(Path(tmp)),
-                destpath=str(dest_dir),
-                include_dir="none",
-                include_files="none"
-            )
-
-            action = ActionFactory().create(test_entry, test_file)
-            action.execute()
+            MoveFile(test_file, dest_dir).execute()
             
             dest_file = dest_dir / "test.txt"
-            self.assertIsInstance(action, MoveFile)
+
             self.assertTrue(not test_file.exists())
             self.assertTrue(dest_file.exists())
-
-            if dest_file.exists():
-                self.assertEqual(dest_file.read_text().rstrip(), large_string)
+            self.assertEqual(dest_file.read_text().rstrip(), large_string)
 
     #--- delete file action ---
     def test_delete_file_default(self):
@@ -688,24 +485,8 @@ class TestAction(unittest.TestCase):
             test_file = Path(tmp) / "test.txt"
             test_file.write_text("test123")    
 
-            test_entry = Entry(
-                id=1,
-                name="test",
-                description="test",
-                type="DELETE",
-                interval_type="newest",
-                schedule_type="",
-                schedule_value=0,
-                originpath=str(Path(tmp)),
-                destpath="",
-                include_dir="none",
-                include_files="none"
-            )
-
-            action = ActionFactory().create(test_entry, test_file)
-            action.execute()
+            DeleteFile(test_file).execute()
             
-            self.assertIsInstance(action, DeleteFile)
             self.assertTrue(not test_file.exists())
 
     #--- dir actions ---
@@ -717,25 +498,10 @@ class TestAction(unittest.TestCase):
             dest_dir = Path(tmp) / "destination"
             dest_dir.mkdir()
 
-            test_entry = Entry(
-                id=1,
-                name="test",
-                description="test",
-                type="COPY",
-                interval_type="newest",
-                schedule_type="",
-                schedule_value=0,
-                originpath=str(tmp),
-                destpath=str(dest_dir),
-                include_dir="none",
-                include_files="none"
-            )
-
-            action = ActionFactory().create(test_entry, test_dir)
-            action.execute()
+            CopyDir(test_dir, dest_dir).execute()
             
             new_dest_dir = dest_dir / "test"
-            self.assertIsInstance(action, CopyDir)
+
             self.assertTrue(dest_dir.exists())
             self.assertTrue(new_dest_dir.exists())
 
@@ -745,25 +511,10 @@ class TestAction(unittest.TestCase):
             test_dir.mkdir()
             dest_dir = Path(tmp) / "destination"
 
-            test_entry = Entry(
-                id=1,
-                name="test",
-                description="test",
-                type="COPY",
-                interval_type="newest",
-                schedule_type="",
-                schedule_value=0,
-                originpath=str(tmp),
-                destpath=str(dest_dir),
-                include_dir="none",
-                include_files="none"
-            )
-
-            action = ActionFactory().create(test_entry, test_dir)
-            action.execute()
+            CopyDir(test_dir, dest_dir).execute()
             
             new_dest_dir = dest_dir / "test"
-            self.assertIsInstance(action, CopyDir)
+
             self.assertTrue(test_dir.exists())
             self.assertTrue(new_dest_dir.exists())
 
@@ -776,25 +527,10 @@ class TestAction(unittest.TestCase):
             existsing_dir = dest_dir / "test"
             existsing_dir.mkdir()
 
-            test_entry = Entry(
-                id=1,
-                name="test",
-                description="test",
-                type="COPY",
-                interval_type="newest",
-                schedule_type="",
-                schedule_value=0,
-                originpath=str(tmp),
-                destpath=str(dest_dir),
-                include_dir="none",
-                include_files="none"
-            )
-
-            action = ActionFactory().create(test_entry, test_dir)
-            action.execute()
+            CopyDir(test_dir, dest_dir).execute()
             
             new_dest_dir = dest_dir / "test (1)"
-            self.assertIsInstance(action, CopyDir)
+
             self.assertTrue(test_dir.exists())
             self.assertTrue(new_dest_dir.exists())
 
@@ -811,25 +547,10 @@ class TestAction(unittest.TestCase):
             existsing_dir_2 = dest_dir / "test (2)"
             existsing_dir_2.mkdir()
 
-            test_entry = Entry(
-                id=1,
-                name="test",
-                description="test",
-                type="COPY",
-                interval_type="newest",
-                schedule_type="",
-                schedule_value=0,
-                originpath=str(tmp),
-                destpath=str(dest_dir),
-                include_dir="none",
-                include_files="none"
-            )
-
-            action = ActionFactory().create(test_entry, test_dir)
-            action.execute()
+            CopyDir(test_dir, dest_dir).execute()
             
             new_dest_dir = dest_dir / "test (3)"
-            self.assertIsInstance(action, CopyDir)
+
             self.assertTrue(test_dir.exists())
             self.assertTrue(new_dest_dir.exists())
 
@@ -842,25 +563,10 @@ class TestAction(unittest.TestCase):
             dest_dir = Path(tmp) / "destination"
             dest_dir.mkdir()      
 
-            test_entry = Entry(
-                id=1,
-                name="test",
-                description="test",
-                type="COPY",
-                interval_type="newest",
-                schedule_type="",
-                schedule_value=0,
-                originpath=str(test_src_dir),
-                destpath=str(dest_dir),
-                include_dir="none",
-                include_files="none"
-            )
-
-            action = ActionFactory().create(test_entry, test_dir)
-            action.execute()
+            CopyDir(test_dir, dest_dir).execute()
             
             new_dest_dir = dest_dir / "test"
-            self.assertIsInstance(action, CopyDir)
+
             self.assertTrue(test_dir.exists())
             self.assertTrue(new_dest_dir.exists())
 
@@ -879,33 +585,17 @@ class TestAction(unittest.TestCase):
             dest_dir = Path(tmp) / "destination"
             dest_dir.mkdir()      
 
-            test_entry = Entry(
-                id=1,
-                name="test",
-                description="test",
-                type="COPY",
-                interval_type="newest",
-                schedule_type="",
-                schedule_value=0,
-                originpath=str(test_dir),
-                destpath=str(dest_dir),
-                include_dir="none",
-                include_files="none"
-            )
-
-            action = ActionFactory().create(test_entry, test_dir)
-            action.execute()
+            CopyDir(test_dir, dest_dir).execute()
             
             new_dest_dir = dest_dir / "test"
-            self.assertIsInstance(action, CopyDir)
+
             self.assertTrue(test_dir.exists())
             self.assertTrue(new_dest_dir.exists())
 
-            if new_dest_dir.exists():
-                self.assertTrue((new_dest_dir / "test1.txt").exists())
-                self.assertTrue((new_dest_dir / "test2.txt").exists())
-                self.assertTrue((new_dest_dir / "test3.txt").exists())
-                self.assertTrue((new_dest_dir / "test4.txt").exists())
+            expected = {"test1.txt", "test2.txt", "test3.txt", "test4.txt"}
+            actual = {p.name for p in new_dest_dir.iterdir()}
+
+            self.assertEqual(actual, expected)
     
     #--- move dir action ---
     def test_move_dir_default(self):
@@ -915,25 +605,10 @@ class TestAction(unittest.TestCase):
             dest_dir = Path(tmp) / "destination"
             dest_dir.mkdir()
 
-            test_entry = Entry(
-                id=1,
-                name="test",
-                description="test",
-                type="MOVE",
-                interval_type="newest",
-                schedule_type="",
-                schedule_value=0,
-                originpath=str(tmp),
-                destpath=str(dest_dir),
-                include_dir="none",
-                include_files="none"
-            )
-
-            action = ActionFactory().create(test_entry, test_dir)
-            action.execute()
+            MoveDir(test_dir, dest_dir).execute()
             
             new_dest_dir = dest_dir / "test"
-            self.assertIsInstance(action, MoveDir)
+
             self.assertTrue(not test_dir.exists())
             self.assertTrue(new_dest_dir.exists())
 
@@ -943,25 +618,10 @@ class TestAction(unittest.TestCase):
             test_dir.mkdir()
             dest_dir = Path(tmp) / "destination"
 
-            test_entry = Entry(
-                id=1,
-                name="test",
-                description="test",
-                type="MOVE",
-                interval_type="newest",
-                schedule_type="",
-                schedule_value=0,
-                originpath=str(tmp),
-                destpath=str(dest_dir),
-                include_dir="none",
-                include_files="none"
-            )
-
-            action = ActionFactory().create(test_entry, test_dir)
-            action.execute()
+            MoveDir(test_dir, dest_dir).execute()
             
             new_dest_dir = dest_dir / "test"
-            self.assertIsInstance(action, MoveDir)
+
             self.assertTrue(not test_dir.exists())
             self.assertTrue(new_dest_dir.exists())
 
@@ -974,25 +634,10 @@ class TestAction(unittest.TestCase):
             existsing_dir = dest_dir / "test"
             existsing_dir.mkdir()
 
-            test_entry = Entry(
-                id=1,
-                name="test",
-                description="test",
-                type="MOVE",
-                interval_type="newest",
-                schedule_type="",
-                schedule_value=0,
-                originpath=str(tmp),
-                destpath=str(dest_dir),
-                include_dir="none",
-                include_files="none"
-            )
-
-            action = ActionFactory().create(test_entry, test_dir)
-            action.execute()
+            MoveDir(test_dir, dest_dir).execute()
             
             new_dest_dir = dest_dir / "test (1)"
-            self.assertIsInstance(action, MoveDir)
+
             self.assertTrue(not test_dir.exists())
             self.assertTrue(new_dest_dir.exists())
 
@@ -1009,25 +654,10 @@ class TestAction(unittest.TestCase):
             existsing_dir_2 = dest_dir / "test (2)"
             existsing_dir_2.mkdir()
 
-            test_entry = Entry(
-                id=1,
-                name="test",
-                description="test",
-                type="MOVE",
-                interval_type="newest",
-                schedule_type="",
-                schedule_value=0,
-                originpath=str(tmp),
-                destpath=str(dest_dir),
-                include_dir="none",
-                include_files="none"
-            )
-
-            action = ActionFactory().create(test_entry, test_dir)
-            action.execute()
+            MoveDir(test_dir, dest_dir).execute()
             
             new_dest_dir = dest_dir / "test (3)"
-            self.assertIsInstance(action, MoveDir)
+
             self.assertTrue(not test_dir.exists())
             self.assertTrue(new_dest_dir.exists())
 
@@ -1040,25 +670,10 @@ class TestAction(unittest.TestCase):
             dest_dir = Path(tmp) / "destination"
             dest_dir.mkdir()      
 
-            test_entry = Entry(
-                id=1,
-                name="test",
-                description="test",
-                type="MOVE",
-                interval_type="newest",
-                schedule_type="",
-                schedule_value=0,
-                originpath=str(test_src_dir),
-                destpath=str(dest_dir),
-                include_dir="none",
-                include_files="none"
-            )
-
-            action = ActionFactory().create(test_entry, test_dir)
-            action.execute()
+            MoveDir(test_dir, dest_dir).execute()
             
             new_dest_dir = dest_dir / "test"
-            self.assertIsInstance(action, MoveDir)
+
             self.assertTrue(not test_dir.exists())
             self.assertTrue(new_dest_dir.exists())
 
@@ -1077,33 +692,18 @@ class TestAction(unittest.TestCase):
             dest_dir = Path(tmp) / "destination"
             dest_dir.mkdir()      
 
-            test_entry = Entry(
-                id=1,
-                name="test",
-                description="test",
-                type="MOVE",
-                interval_type="newest",
-                schedule_type="",
-                schedule_value=0,
-                originpath=str(test_dir),
-                destpath=str(dest_dir),
-                include_dir="none",
-                include_files="none"
-            )
-
-            action = ActionFactory().create(test_entry, test_dir)
-            action.execute()
+            MoveDir(test_dir, dest_dir).execute()
             
             new_dest_dir = dest_dir / "test"
-            self.assertIsInstance(action, MoveDir)
+            
             self.assertTrue(not test_dir.exists())
             self.assertTrue(new_dest_dir.exists())
 
-            if new_dest_dir.exists():
-                self.assertTrue((new_dest_dir / "test1.txt").exists())
-                self.assertTrue((new_dest_dir / "test2.txt").exists())
-                self.assertTrue((new_dest_dir / "test3.txt").exists())
-                self.assertTrue((new_dest_dir / "test4.txt").exists())
+            
+            expected = {"test1.txt", "test2.txt", "test3.txt", "test4.txt"}
+            actual = {p.name for p in new_dest_dir.iterdir()}
+
+            self.assertEqual(actual, expected)
     
     #--- delete dir action ---
     def test_delete_dir_default(self):
@@ -1111,24 +711,8 @@ class TestAction(unittest.TestCase):
             test_dir = Path(tmp) / "test"
             test_dir.mkdir()
 
-            test_entry = Entry(
-                id=1,
-                name="test",
-                description="test",
-                type="DELETE",
-                interval_type="newest",
-                schedule_type="",
-                schedule_value=0,
-                originpath=str(Path(tmp)),
-                destpath="",
-                include_dir="none",
-                include_files="none"
-            )
-
-            action = ActionFactory().create(test_entry, test_dir)
-            action.execute()
+            DeleteDir(test_dir).execute()
             
-            self.assertIsInstance(action, DeleteDir)
             self.assertTrue(not test_dir.exists())
 
 
