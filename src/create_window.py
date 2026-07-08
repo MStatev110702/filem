@@ -266,7 +266,6 @@ class CreateWindow(QtWidgets.QWidget):
                 ErrorWindow(f"Something went wrong while retrieving the file types.\n{file_type_result.get("error")}").exec()
                 return 
             
-            print(file_type_result.get("data"))
             self.type_list_model = TypeListModel(file_type_result.get("data"))
 
         self.type_list.setModel(self.type_list_model)

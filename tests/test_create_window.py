@@ -69,7 +69,6 @@ class TestCreateWindow(unittest.TestCase):
         window.name_input.setText("Test Case3")
         window.desc_input.setText("Test123")
         window.type_combo.setCurrentIndex(window.type_combo.findData(TypeComboValues.DELETE))
-        print(window.required_fields)
         window.origin_input.setText(str(Path().absolute()))
         self.assertEqual(window.form_is_valid(), True)
 
