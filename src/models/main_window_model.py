@@ -1,7 +1,7 @@
 from PyQt6 import QtCore
 from PyQt6.QtCore import Qt
-from .database.queries import db_call, get_all_entries
-from .error_window import ErrorWindow
+from ..database.queries import db_call, get_all_entries
+from ..views.error_window import ErrorWindow
 
 class TableModel(QtCore.QAbstractTableModel):
     def __init__(self):

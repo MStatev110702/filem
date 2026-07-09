@@ -4,7 +4,6 @@ import random
 import string
 from pathlib import Path
 from base_test import BaseTest
-from src.entry import Entry
 from src.action.file_actions import CopyFile, MoveFile, DeleteFile
 from src.action.dir_actions import CopyDir, MoveDir, DeleteDir
 from src.action.action_factory import ActionFactory

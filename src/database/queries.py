@@ -1,7 +1,7 @@
 import sqlite3
 from .db import Database
 from .query_response import QueryResponse
-from ..entry import Entry
+from ..entities.entry import Entry
 
 def db_call(fn, *args, **kwargs) -> QueryResponse:
     try:

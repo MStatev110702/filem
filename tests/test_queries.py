@@ -4,7 +4,7 @@ import sqlite3
 import uuid
 from dataclasses import astuple, replace
 from base_test import BaseTest
-from src.entry import Entry
+from src.entities.entry import Entry
 from src.database.db import Database
 from src.database.queries import *
 

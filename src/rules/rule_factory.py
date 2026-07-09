@@ -1,7 +1,7 @@
 from .entry_rule import EntryRule
 from .dir_rules import AllDirs, EmptyDirs, FilledDirs
 from .file_rules import AllFiles, ExcludeTypes, IncludeTypes
-from ..entry import Entry
+from ..entities.entry import Entry
 
 class RuleFactory():
     @staticmethod

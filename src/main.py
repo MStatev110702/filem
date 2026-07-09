@@ -1,11 +1,13 @@
 import sys
-from PyQt6 import QtWidgets
-from .main_window import MainWindow
+from PyQt6.QtWidgets import QApplication
+from .controllers.main_window_controller import MainController
 
 def main():
-    app = QtWidgets.QApplication(sys.argv)
-    ui = MainWindow()
-    ui.show()
+    app = QApplication(sys.argv)
+    
+    controller = MainController()
+    controller.view.show()
+    
     sys.exit(app.exec())
 
 if __name__ == "__main__":

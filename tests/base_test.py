@@ -1,5 +1,5 @@
 import unittest
-from src.entry import Entry
+from src.entities.entry import Entry
 
 class BaseTest(unittest.TestCase):
     def create_test_entry(self, **overrides) -> Entry:

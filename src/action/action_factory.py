@@ -1,5 +1,5 @@
 from pathlib import Path
-from ..entry import Entry
+from ..entities.entry import Entry
 from .action import Action
 from .file_actions import CopyFile, MoveFile, DeleteFile
 from .dir_actions import CopyDir, MoveDir, DeleteDir
