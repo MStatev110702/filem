@@ -123,7 +123,7 @@ class TestQueries(BaseTest):
     def test_create_entry_valid_entry(self):
         test_entry = self.create_test_entry()
         result = db_call(create_entry, test_entry, self.test_db)
-        
+
         self.assertTrue(result.get("success"))
         self.assertEqual(result.get("data"), 1)
         
@@ -131,7 +131,6 @@ class TestQueries(BaseTest):
         expected = astuple(
             replace(test_entry, id=result.get("data"))
         )
-        expected += (0,)
 
         self.assertEqual(tuple(actual), expected)
 

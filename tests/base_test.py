@@ -14,7 +14,8 @@ class BaseTest(unittest.TestCase):
             "originpath": "/origintmp",
             "destpath": "/desttmp",
             "include_dir": "none",
-            "include_files": "none"
+            "include_files": "none",
+            "state": 0
         }
 
         data.update(overrides)

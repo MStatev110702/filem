@@ -1,5 +1,5 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QGridLayout, QHBoxLayout, QStackedLayout, QLabel, QLineEdit, QSizePolicy, QTextEdit, QComboBox, QSpinBox, QRadioButton, QButtonGroup, QTimeEdit, QTabWidget, QListView, QToolButton, QPushButton
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QGridLayout, QHBoxLayout, QStackedLayout, QLabel, QLineEdit, QSizePolicy, QTextEdit, QComboBox, QSpinBox, QRadioButton, QButtonGroup, QTimeEdit, QTabWidget, QListView, QToolButton, QPushButton, QCheckBox
 from enum import Enum
 from ..models.create_window_model import TypeListModel
 from ..entities.enums import TypeComboValues
@@ -44,6 +44,10 @@ class CreateWindow(QWidget):
         self.type_combo.setObjectName("type_combo")
         self.type_combo.currentIndexChanged.connect(self.type_combo_changed)
 
+        self.activate_check = QCheckBox()
+        self.activate_check.setObjectName("activate_check")
+        self.activate_check.setChecked(True)
+
         form.addWidget(self.name_label, 0, 0)
         form.addWidget(self.name_input, 0, 1)
 
@@ -53,6 +57,7 @@ class CreateWindow(QWidget):
         form.addWidget(self.type_label, 2, 0)
         form.addWidget(self.type_combo, 2, 1)
 
+        form.addWidget(self.activate_check)
         #--- main radio buttons ---
         radio_layout = QHBoxLayout()
 
@@ -316,6 +321,9 @@ class CreateWindow(QWidget):
         self.files_selected_radio.setText(_translate("create_window", "selected types"))
         self.files_exclude_radio.setText(_translate("create_window", "exclude types"))
         self.files_all_radio.setText(_translate("create_window", "all"))
+
+        #checkbox
+        self.activate_check.setText(_translate("create_window", "activate"))
 
     def _setup_required_field(self):
         self.required_fields = [

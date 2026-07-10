@@ -30,9 +30,9 @@ def create_entry(entry: Entry, db: Database|None = None) -> int:
         sql = """
             INSERT INTO entries(
                 name, description, type, interval_type, schedule_type, schedule_value,
-                originpath, destpath, include_dir, include_files
+                originpath, destpath, include_dir, include_files, state
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """
 
         db.execute(sql, (
@@ -46,6 +46,7 @@ def create_entry(entry: Entry, db: Database|None = None) -> int:
             entry.destpath,
             entry.include_dir,
             entry.include_files,
+            entry.state
         ))
 
         return db.getlastrowid()
@@ -88,7 +89,7 @@ def get_selected_entry(id: int, db: Database|None = None):
     with db:
         sql = """
             SELECT id, name, description, type, interval_type, schedule_type, schedule_value,
-                    originpath, destpath, include_dir, include_files
+                    originpath, destpath, include_dir, include_files, state
             FROM entries 
             Where id = ?
         """
@@ -146,7 +147,8 @@ def edit_entry(entry:Entry, db: Database|None = None) -> None:
                 originpath = ?, 
                 destpath = ?, 
                 include_dir = ?, 
-                include_files = ?
+                include_files = ?,
+                state = ?
             WHERE
                 id = ?
         """
@@ -162,6 +164,7 @@ def edit_entry(entry:Entry, db: Database|None = None) -> None:
             entry.destpath,
             entry.include_dir,
             entry.include_files,
+            entry.state,
             entry.id
         ))
 

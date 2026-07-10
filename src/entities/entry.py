@@ -13,6 +13,7 @@ class Entry:
     destpath: str
     include_dir: str
     include_files: str
+    state: int
 
     @staticmethod
     def from_row(row) -> "Entry":
@@ -28,4 +29,5 @@ class Entry:
             destpath=row["destpath"],
             include_dir=row["include_dir"],
             include_files=row["include_files"],
+            state=row["state"]
         )

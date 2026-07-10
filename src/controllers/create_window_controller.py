@@ -3,7 +3,6 @@ from PyQt6.QtWidgets import QFileDialog, QWidget
 from pathlib import Path
 import platform
 from pathvalidate import is_valid_filepath
-
 from ..views.create_window import CreateWindow
 from ..database.queries import db_call, create_entry, edit_entry, get_file_types, create_file_types, edit_file_types
 from ..entities.entry import Entry
@@ -118,6 +117,7 @@ class CreateController:
         v.name_input.setText(self.row.name.strip())
         v.desc_input.insertPlainText(self.row.description.strip())
         v.set_combo_value(v.type_combo, TypeComboValues[self.row.type.strip()])
+        v.activate_check.setChecked(True if self.row.state != 0 else False)
         v.set_radio_by_text(v.main_radio_group, self.row.interval_type.strip())
         
         if self.row.interval_type.strip() == "interval":
@@ -192,6 +192,7 @@ class CreateController:
             destpath=destpath,
             include_dir=v.dir_btn_group.checkedButton().text(),
             include_files=v.files_btn_group.checkedButton().text(),
+            state=1 if v.activate_check.isChecked() else 0
         )
         file_types=self.model.get_data()
 
