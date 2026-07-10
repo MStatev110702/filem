@@ -25,8 +25,22 @@ class TableModel(QtCore.QAbstractTableModel):
         self.load()
 
     def data(self, index, role):
-        if role == Qt.ItemDataRole.DisplayRole:
-            return self._data[index.row()][index.column()]
+        if not index.isValid():
+            return None
+
+        value = self._data[index.row()][index.column()]
+
+        if role == QtCore.Qt.ItemDataRole.DisplayRole:
+            if index.column() == 12:
+                if value == 1:
+                    return "Active"
+                elif value == 2:
+                    return "Running"
+                else:
+                    return "Inactive"
+            return value
+
+        return None
 
     def rowCount(self, index):
         return len(self._data)
@@ -49,7 +63,7 @@ class TableModel(QtCore.QAbstractTableModel):
         if not result.get("success"):
             ErrorWindow(f"Error while retrieving database entries:\n{result.get("error")}").exec()
         else:
-            self._data = result.get("data")    
+            self._data = result.get("data") 
         self.endResetModel()
             
     
