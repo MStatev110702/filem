@@ -20,7 +20,9 @@ class TableModel(QtCore.QAbstractTableModel):
             "include dir",
             "include files",
             "file types",
-            "state"
+            "state",
+            "last run",
+            "next run"
         ]
         self.load()
 

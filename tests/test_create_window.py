@@ -15,7 +15,6 @@ class TestCreateWindow(unittest.TestCase):
         self.controller = CreateController(self.main_view, self.main_model)
         self.view = self.controller.view
 
-
     #--- form validation tests ---
 
     def test_form_is_valid_valid_default_fields(self):

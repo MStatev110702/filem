@@ -3,6 +3,7 @@ from unittest.mock import MagicMock
 import sqlite3
 import uuid
 from dataclasses import astuple, replace
+from datetime import datetime
 from base_test import BaseTest
 from src.entities.entry import Entry
 from src.database.db import Database
@@ -122,7 +123,7 @@ class TestQueries(BaseTest):
 
     def test_create_entry_valid_entry(self):
         test_entry = self.create_test_entry()
-        result = db_call(create_entry, test_entry, self.test_db)
+        result = db_call(create_entry, test_entry, datetime.now(), self.test_db)
 
         self.assertTrue(result.get("success"))
         self.assertEqual(result.get("data"), 1)
@@ -136,7 +137,7 @@ class TestQueries(BaseTest):
 
     def test_create_entry_invalid_entry(self):
         test_entry = self.create_test_entry(name=None)
-        result = db_call(create_entry, test_entry, self.test_db)
+        result = db_call(create_entry, test_entry, datetime.now(), self.test_db)
         
         self.assertFalse(result.get("success"))
         self.assertStartsWith(result.get("error"), "Database error:") 
@@ -374,7 +375,7 @@ class TestQueries(BaseTest):
         self.create_sql_entry(test_entry)
 
         new_entry = replace(test_entry, id=self.verify_db.getlastrowid(), name="changed entry")
-        result = db_call(edit_entry, new_entry, self.test_db)
+        result = db_call(edit_entry, new_entry, datetime.now(), self.test_db)
 
         self.assertTrue(result.get("success"))
         self.assertEqual(self.get_entry_by_id(self.verify_db.getlastrowid())["name"], "changed entry")
@@ -384,7 +385,7 @@ class TestQueries(BaseTest):
         self.create_sql_entry(test_entry)
 
         new_entry = replace(test_entry, id=self.verify_db.getlastrowid(), name=None)
-        result = db_call(edit_entry, new_entry, self.test_db)
+        result = db_call(edit_entry, new_entry, datetime.now(), self.test_db)
 
         self.assertFalse(result.get("success"))
         self.assertStartsWith(result.get("error"), "Database error:")
@@ -401,7 +402,7 @@ class TestQueries(BaseTest):
             new_test = self.create_test_entry(name=f"test{i}")
             self.create_sql_entry(new_test)
 
-        result = db_call(edit_entry, new_entry, self.test_db)
+        result = db_call(edit_entry, new_entry, datetime.now(), self.test_db)
 
         self.assertTrue(result.get("success"))
         self.assertEqual(self.get_entry_by_id(entry_id)["name"], "Testchangedabc")

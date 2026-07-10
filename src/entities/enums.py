@@ -10,4 +10,3 @@ class IntervalTypeComboValues(Enum):
     MIN = "minutes"
     H = "hours"
     D = "days"
-    MON = "months"

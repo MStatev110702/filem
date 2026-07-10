@@ -3,6 +3,8 @@ from PyQt6.QtWidgets import QFileDialog, QWidget
 from pathlib import Path
 import platform
 from pathvalidate import is_valid_filepath
+from datetime import datetime, timedelta
+from calendar import monthrange
 from ..views.create_window import CreateWindow
 from ..database.queries import db_call, create_entry, edit_entry, get_file_types, create_file_types, edit_file_types
 from ..entities.entry import Entry
@@ -10,6 +12,7 @@ from ..entities.enums import TypeComboValues, IntervalTypeComboValues
 from ..models.create_window_model import TypeListModel
 from ..models.main_window_model import TableModel
 from ..views.error_window import ErrorWindow
+from ..utils.calculate_next_run import calculate_next_run
 
 class CreateController:
     def __init__(self, parent: QWidget, table_model: TableModel, row: Entry | None = None):
@@ -194,10 +197,11 @@ class CreateController:
             include_files=v.files_btn_group.checkedButton().text(),
             state=1 if v.activate_check.isChecked() else 0
         )
-        file_types=self.model.get_data()
+        file_types = self.model.get_data()
+        next_run = calculate_next_run(main_group, schedule_type, schedule_value) if main_group != "manually" else None
 
         if self.mode == "create":
-            result = db_call(create_entry, entry)
+            result = db_call(create_entry, entry, next_run)
 
             if not result.get("success"):
                 ErrorWindow(f"Something went wrong while creating the entry.\n{result.get("error")}").exec()
@@ -210,7 +214,7 @@ class CreateController:
                 return 
         else: 
             entry.id = self.row.id
-            result = db_call(edit_entry, entry) 
+            result = db_call(edit_entry, entry, next_run) 
 
             if not result.get("success"):
                 ErrorWindow(f"Something went wrong while editing the entry.\n{result.get("error")}").exec()

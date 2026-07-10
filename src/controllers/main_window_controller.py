@@ -18,6 +18,7 @@ class MainController:
         self.view.create_btn.clicked.connect(self.open_create_window)
         self.view.delete_btn.clicked.connect(self.delete_selected_entry)
         self.view.edit_btn.clicked.connect(self.open_edit_window)
+        self.view.start_btn.clicked.connect(self.start_entry)
         self.view.script_table.doubleClicked.connect(self.open_edit_window)
 
     def open_create_window(self):
@@ -62,3 +63,13 @@ class MainController:
         self.create_controller = CreateController(self.view, self.model, entry)
         self.create_controller.view.setWindowModality(Qt.WindowModality.ApplicationModal)
         self.create_controller.view.show()
+
+    def start_entry(self):
+        index = self.view.script_table.selectionModel().currentIndex()
+
+        if index.row() == -1:
+            ErrorWindow("Please select one row in the table.").exec()
+            return
+        
+        row_id = self.model.get_row_id(index)
+        

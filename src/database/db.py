@@ -72,6 +72,7 @@ class Database:
                 include_dir TEXT NOT NULL,
                 include_files TEXT NOT NULL,
                 last_run DATE,
+                next_run DATE,
                 state INTEGER DEFAULT 0
             );""",
             """CREATE TABLE IF NOT EXISTS file_types (
