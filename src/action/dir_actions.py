@@ -32,7 +32,7 @@ class CopyDir(Action):
         dir_name = src.name
         self.dest.mkdir(parents=True, exist_ok=True)
         dest_dir = self.dest / dir_name
-        print(dir_name)
+
         if dest_dir.exists():
             new_name = self.auto_rename(dir_name)
             dest_dir = self.dest / f"{new_name}"

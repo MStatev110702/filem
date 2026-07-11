@@ -93,7 +93,7 @@ def get_selected_entry(id: int, db: Database|None = None):
     with db:
         sql = """
             SELECT id, name, description, type, interval_type, schedule_type, schedule_value,
-                    originpath, destpath, include_dir, include_files, state
+                    originpath, destpath, include_dir, include_files, state, strftime('%d.%m.%Y %H:%M:%S', next_run) as next_run
             FROM entries 
             Where id = ?
         """
@@ -177,3 +177,46 @@ def edit_entry(entry:Entry, next_run: datetime, db: Database|None = None) -> Non
 def edit_file_types(id: int, file_types: list) -> None:
     delete_file_types(id)
     create_file_types(id, file_types)
+
+
+def change_entry_state(id: int, state: int, db: Database|None = None) -> None:
+    db = get_db(db)
+
+    with db:
+        sql = """
+            UPDATE entries
+            SET
+                state = ?
+            WHERE
+                id = ?
+        """
+
+        db.execute(sql, (state, id))
+
+def update_last_run(id: int, db: Database|None = None) -> None:
+    db = get_db(db)
+
+    with db:
+        sql = """
+            UPDATE entries
+            SET
+                last_run = ?
+            WHERE 
+                id = ?
+        """
+        
+        db.execute(sql, (datetime.now(), id))
+
+def update_next_run(id: int, next_run: datetime, db: Database|None = None) -> None:
+    db = get_db(db)
+
+    with db:
+        sql = """
+            UPDATE entries
+            SET
+                next_run = ?
+            WHERE
+                id = ?
+        """
+
+        db.execute(sql, (next_run, id))

@@ -254,8 +254,5 @@ class CreateController:
 
         if not is_abs:
             return False
-
-        if "." in Path(path).name:
-            return False
         
         return is_valid_filepath(path, platform=user_platform)

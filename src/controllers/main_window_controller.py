@@ -5,6 +5,7 @@ from ..database.queries import db_call, get_selected_entry, delete_entry
 from ..models.main_window_model import TableModel
 from ..views.main_window import MainWindow
 from ..views.error_window import ErrorWindow
+from ..utils.start_entry import start_entry
 
 class MainController:
     def __init__(self):
@@ -18,7 +19,7 @@ class MainController:
         self.view.create_btn.clicked.connect(self.open_create_window)
         self.view.delete_btn.clicked.connect(self.delete_selected_entry)
         self.view.edit_btn.clicked.connect(self.open_edit_window)
-        self.view.start_btn.clicked.connect(self.start_entry)
+        self.view.start_btn.clicked.connect(self.start_selected_entry)
         self.view.script_table.doubleClicked.connect(self.open_edit_window)
 
     def open_create_window(self):
@@ -64,7 +65,7 @@ class MainController:
         self.create_controller.view.setWindowModality(Qt.WindowModality.ApplicationModal)
         self.create_controller.view.show()
 
-    def start_entry(self):
+    def start_selected_entry(self):
         index = self.view.script_table.selectionModel().currentIndex()
 
         if index.row() == -1:
@@ -72,4 +73,5 @@ class MainController:
             return
         
         row_id = self.model.get_row_id(index)
+        start_entry(row_id)
         
