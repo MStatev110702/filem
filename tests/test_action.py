@@ -6,133 +6,93 @@ from pathlib import Path
 from base_test import BaseTest
 from src.action.file_actions import CopyFile, MoveFile, DeleteFile
 from src.action.dir_actions import CopyDir, MoveDir, DeleteDir
-from src.action.action_factory import ActionFactory
+from src.action.action_factory import FileActionFactory, DirActionFactory
 
 class TestAction(BaseTest):
     #--- factory tests---
     def test_action_factory_copy_file(self):
        with tempfile.TemporaryDirectory() as tmp:
-            test_file = Path(tmp) / "test.txt"
-            test_file.write_text("Hello")
             dest_dir = Path(tmp) / "destination"
-            dest_dir.mkdir()
 
             test_entry = self.create_test_entry(
                 type="COPY",
                 destpath=str(dest_dir)
             )
 
-            action = ActionFactory().create(test_entry, test_file)
+            action = FileActionFactory().create(test_entry)
             self.assertIsInstance(action, CopyFile) 
 
     def test_action_factory_move_file(self):
        with tempfile.TemporaryDirectory() as tmp:
-            test_file = Path(tmp) / "test.txt"
-            test_file.write_text("Hello")
             dest_dir = Path(tmp) / "destination"
-            dest_dir.mkdir()
 
             test_entry = self.create_test_entry(
                 type="MOVE",
                 destpath=str(dest_dir)
             )
 
-            action = ActionFactory().create(test_entry, test_file)
+            action = FileActionFactory().create(test_entry)
             self.assertIsInstance(action, MoveFile)
 
     def test_action_factory_delete_file(self):
        with tempfile.TemporaryDirectory() as tmp:
-            test_file = Path(tmp) / "test.txt"
-            test_file.write_text("Hello")
-
             test_entry = self.create_test_entry(
                 type="DELETE"
             )
 
-            action = ActionFactory().create(test_entry, test_file)
+            action = FileActionFactory().create(test_entry)
             self.assertIsInstance(action, DeleteFile)
-
-    def test_action_factory_dest_empty_spaces(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            test_file = Path(tmp) / "test.txt"
-            test_file.write_text("")
-            dest_dir = Path(tmp) / "destination"
-            dest_dir.mkdir()      
-
-            test_entry = self.create_test_entry(
-                type="COPY",
-                destpath="   "
-            )
-
-            with self.assertRaises(ValueError):
-                ActionFactory().create(test_entry, test_file)
-
-    def test_action_factory_dest_path_empty(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            test_file = Path(tmp) / "test.txt"
-            test_file.write_text("Hello")
-
-            test_entry = self.create_test_entry(
-                type="COPY",
-                destpath=""
-            )
-
-            with self.assertRaises(ValueError):
-                ActionFactory().create(test_entry, test_file)
- 
-    def test_action_factory_src_path_empty(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            dest_dir = Path(tmp) / "destination"
-
-            test_entry = self.create_test_entry(
-                type="COPY",
-                destpath=str(dest_dir)
-            )
-
-            with self.assertRaises(ValueError):
-                ActionFactory().create(test_entry, Path(""))
-
-    def test_action_factoyr_src_path_not_exists(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            dest_dir = Path(tmp) / "destination"
-
-            test_entry = self.create_test_entry(
-                type="COPY",
-                destpath=str(dest_dir)
-            )
-
-            with self.assertRaises(FileExistsError):
-                ActionFactory().create(test_entry, (Path(tmp) / "test.txt"))
 
     def test_action_factory_file_unknown_type(self):
         with tempfile.TemporaryDirectory() as tmp:
-            test_file = Path(tmp) / "test.txt"
-            test_file.write_text("Hello")
-            dest_dir = Path(tmp) / "destination"
-            dest_dir.mkdir()
-
             test_entry = self.create_test_entry(
                 type="WHAT_IS_THIS",
-                destpath=str(dest_dir)
             )
 
             with self.assertRaises(ValueError):
-                ActionFactory().create(test_entry, test_file)
+                FileActionFactory().create(test_entry)
+
+    def test_action_factory_copy_dir(self):
+       with tempfile.TemporaryDirectory() as tmp:
+            dest_dir = Path(tmp) / "destination"
+
+            test_entry = self.create_test_entry(
+                type="COPY",
+                destpath=str(dest_dir)
+            )
+
+            action = DirActionFactory().create(test_entry)
+            self.assertIsInstance(action, CopyDir) 
+
+    def test_action_factory_move_dir(self):
+       with tempfile.TemporaryDirectory() as tmp:
+            dest_dir = Path(tmp) / "destination"
+
+            test_entry = self.create_test_entry(
+                type="MOVE",
+                destpath=str(dest_dir)
+            )
+
+            action = DirActionFactory().create(test_entry)
+            self.assertIsInstance(action, MoveDir)
+
+    def test_action_factory_delete_dir(self):
+       with tempfile.TemporaryDirectory() as tmp:
+            test_entry = self.create_test_entry(
+                type="DELETE"
+            )
+
+            action = DirActionFactory().create(test_entry)
+            self.assertIsInstance(action, DeleteDir)
 
     def test_action_factory_dir_unknown_type(self):
         with tempfile.TemporaryDirectory() as tmp:
-            test_dir = Path(tmp) / "test"
-            test_dir.mkdir()
-            dest_dir = Path(tmp) / "destination"
-            dest_dir.mkdir()
-
             test_entry = self.create_test_entry(
                 type="WHAT_IS_THIS",
-                destpath=str(dest_dir)
             )
 
             with self.assertRaises(ValueError):
-                ActionFactory().create(test_entry, test_dir)
+                DirActionFactory().create(test_entry)
 
     #--- file actions ---
     #--- copy file action ---
@@ -143,7 +103,7 @@ class TestAction(BaseTest):
             dest_dir = Path(tmp) / "destination"
             dest_dir.mkdir()
 
-            CopyFile(test_file, dest_dir).execute()
+            CopyFile(dest_dir).execute(test_file)
             
             dest_file = dest_dir / "test.txt"
 
@@ -157,7 +117,7 @@ class TestAction(BaseTest):
             test_file.write_text("Hello")
             dest_dir = Path(tmp) / "destination"
 
-            CopyFile(test_file, dest_dir).execute()
+            CopyFile(dest_dir).execute(test_file)
             
             dest_file = dest_dir / "test.txt"
 
@@ -174,7 +134,7 @@ class TestAction(BaseTest):
             existsing_file = dest_dir / "test.txt"
             existsing_file.write_text("test123")         
 
-            CopyFile(test_file, dest_dir).execute()
+            CopyFile(dest_dir).execute(test_file)
             
             dest_file = dest_dir / "test (1).txt"
 
@@ -195,7 +155,7 @@ class TestAction(BaseTest):
             existsing_file_2 = dest_dir / "test (2).txt"
             existsing_file_2.write_text("test123")         
 
-            CopyFile(test_file, dest_dir).execute()
+            CopyFile(dest_dir).execute(test_file)
             
             dest_file = dest_dir / "test (3).txt"
 
@@ -212,7 +172,7 @@ class TestAction(BaseTest):
             dest_dir = Path(tmp) / "destination"
             dest_dir.mkdir()
 
-            CopyFile(test_file, dest_dir).execute()
+            CopyFile(dest_dir).execute(test_file)
             
             dest_file = dest_dir / "test.txt"
 
@@ -227,7 +187,7 @@ class TestAction(BaseTest):
             dest_dir = Path(tmp) / "destination"
             dest_dir.mkdir()      
 
-            CopyFile(test_file, dest_dir).execute()
+            CopyFile(dest_dir).execute(test_file)
 
             dest_file = dest_dir / "test.txt"
 
@@ -242,7 +202,7 @@ class TestAction(BaseTest):
             dest_dir = Path(tmp) / "destination"
             dest_dir.mkdir()      
 
-            CopyFile(test_file, dest_dir).execute()
+            CopyFile(dest_dir).execute(test_file)
             
             dest_file = dest_dir / "test.txt"
 
@@ -258,7 +218,7 @@ class TestAction(BaseTest):
             dest_dir = Path(tmp) / "destination"
             dest_dir.mkdir()      
 
-            CopyFile(test_file, dest_dir).execute()
+            CopyFile(dest_dir).execute(test_file)
             
             dest_file = dest_dir / "test.txt"
 
@@ -274,7 +234,7 @@ class TestAction(BaseTest):
             dest_dir = Path(tmp) / "destination"
             dest_dir.mkdir()
 
-            MoveFile(test_file, dest_dir).execute()
+            MoveFile(dest_dir).execute(test_file)
             
             dest_file = dest_dir / "test.txt"
 
@@ -288,7 +248,7 @@ class TestAction(BaseTest):
             test_file.write_text("Hello")
             dest_dir = Path(tmp) / "destination"
 
-            MoveFile(test_file, dest_dir).execute()
+            MoveFile(dest_dir).execute(test_file)
             
             dest_file = dest_dir / "test.txt"
 
@@ -305,7 +265,7 @@ class TestAction(BaseTest):
             existsing_file = dest_dir / "test.txt"
             existsing_file.write_text("test123")         
 
-            MoveFile(test_file, dest_dir).execute()
+            MoveFile(dest_dir).execute(test_file)
             
             dest_file = dest_dir / "test (1).txt"
             
@@ -326,7 +286,7 @@ class TestAction(BaseTest):
             existsing_file_2 = dest_dir / "test (2).txt"
             existsing_file_2.write_text("test123")         
 
-            MoveFile(test_file, dest_dir).execute()
+            MoveFile(dest_dir).execute(test_file)
             
             dest_file = dest_dir / "test (3).txt"
             
@@ -343,7 +303,7 @@ class TestAction(BaseTest):
             dest_dir = Path(tmp) / "destination"
             dest_dir.mkdir()      
 
-            MoveFile(test_file, dest_dir).execute()
+            MoveFile(dest_dir).execute(test_file)
             
             dest_file = dest_dir / "test.txt"
 
@@ -358,7 +318,7 @@ class TestAction(BaseTest):
             dest_dir = Path(tmp) / "destination"
             dest_dir.mkdir()      
 
-            MoveFile(test_file, dest_dir).execute()
+            MoveFile(dest_dir).execute(test_file)
             
             dest_file = dest_dir / "test.txt"
 
@@ -373,7 +333,7 @@ class TestAction(BaseTest):
             dest_dir = Path(tmp) / "destination"
             dest_dir.mkdir()      
 
-            MoveFile(test_file, dest_dir).execute()
+            MoveFile(dest_dir).execute(test_file)
             
             dest_file = dest_dir / "test.txt"
 
@@ -389,7 +349,7 @@ class TestAction(BaseTest):
             dest_dir = Path(tmp) / "destination"
             dest_dir.mkdir()      
 
-            MoveFile(test_file, dest_dir).execute()
+            MoveFile(dest_dir).execute(test_file)
             
             dest_file = dest_dir / "test.txt"
 
@@ -403,7 +363,7 @@ class TestAction(BaseTest):
             test_file = Path(tmp) / "test.txt"
             test_file.write_text("test123")    
 
-            DeleteFile(test_file).execute()
+            DeleteFile().execute(test_file)
             
             self.assertTrue(not test_file.exists())
 
@@ -416,7 +376,7 @@ class TestAction(BaseTest):
             dest_dir = Path(tmp) / "destination"
             dest_dir.mkdir()
 
-            CopyDir(test_dir, dest_dir).execute()
+            CopyDir(dest_dir).execute(test_dir)
             
             new_dest_dir = dest_dir / "test"
 
@@ -429,7 +389,7 @@ class TestAction(BaseTest):
             test_dir.mkdir()
             dest_dir = Path(tmp) / "destination"
 
-            CopyDir(test_dir, dest_dir).execute()
+            CopyDir(dest_dir).execute(test_dir)
             
             new_dest_dir = dest_dir / "test"
 
@@ -445,7 +405,7 @@ class TestAction(BaseTest):
             existsing_dir = dest_dir / "test"
             existsing_dir.mkdir()
 
-            CopyDir(test_dir, dest_dir).execute()
+            CopyDir(dest_dir).execute(test_dir)
             
             new_dest_dir = dest_dir / "test (1)"
 
@@ -465,7 +425,7 @@ class TestAction(BaseTest):
             existsing_dir_2 = dest_dir / "test (2)"
             existsing_dir_2.mkdir()
 
-            CopyDir(test_dir, dest_dir).execute()
+            CopyDir(dest_dir).execute(test_dir)
             
             new_dest_dir = dest_dir / "test (3)"
 
@@ -481,7 +441,7 @@ class TestAction(BaseTest):
             dest_dir = Path(tmp) / "destination"
             dest_dir.mkdir()      
 
-            CopyDir(test_dir, dest_dir).execute()
+            CopyDir(dest_dir).execute(test_dir)
             
             new_dest_dir = dest_dir / "test"
 
@@ -503,7 +463,7 @@ class TestAction(BaseTest):
             dest_dir = Path(tmp) / "destination"
             dest_dir.mkdir()      
 
-            CopyDir(test_dir, dest_dir).execute()
+            CopyDir(dest_dir).execute(test_dir)
             
             new_dest_dir = dest_dir / "test"
 
@@ -523,7 +483,7 @@ class TestAction(BaseTest):
             dest_dir = Path(tmp) / "destination"
             dest_dir.mkdir()
 
-            MoveDir(test_dir, dest_dir).execute()
+            MoveDir(dest_dir).execute(test_dir)
             
             new_dest_dir = dest_dir / "test"
 
@@ -536,7 +496,7 @@ class TestAction(BaseTest):
             test_dir.mkdir()
             dest_dir = Path(tmp) / "destination"
 
-            MoveDir(test_dir, dest_dir).execute()
+            MoveDir(dest_dir).execute(test_dir)
             
             new_dest_dir = dest_dir / "test"
 
@@ -552,7 +512,7 @@ class TestAction(BaseTest):
             existsing_dir = dest_dir / "test"
             existsing_dir.mkdir()
 
-            MoveDir(test_dir, dest_dir).execute()
+            MoveDir(dest_dir).execute(test_dir)
             
             new_dest_dir = dest_dir / "test (1)"
 
@@ -572,7 +532,7 @@ class TestAction(BaseTest):
             existsing_dir_2 = dest_dir / "test (2)"
             existsing_dir_2.mkdir()
 
-            MoveDir(test_dir, dest_dir).execute()
+            MoveDir(dest_dir).execute(test_dir)
             
             new_dest_dir = dest_dir / "test (3)"
 
@@ -588,7 +548,7 @@ class TestAction(BaseTest):
             dest_dir = Path(tmp) / "destination"
             dest_dir.mkdir()      
 
-            MoveDir(test_dir, dest_dir).execute()
+            MoveDir(dest_dir).execute(test_dir)
             
             new_dest_dir = dest_dir / "test"
 
@@ -610,7 +570,7 @@ class TestAction(BaseTest):
             dest_dir = Path(tmp) / "destination"
             dest_dir.mkdir()      
 
-            MoveDir(test_dir, dest_dir).execute()
+            MoveDir(dest_dir).execute(test_dir)
             
             new_dest_dir = dest_dir / "test"
             
@@ -629,7 +589,7 @@ class TestAction(BaseTest):
             test_dir = Path(tmp) / "test"
             test_dir.mkdir()
 
-            DeleteDir(test_dir).execute()
+            DeleteDir().execute(test_dir)
             
             self.assertTrue(not test_dir.exists())
 

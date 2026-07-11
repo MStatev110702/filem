@@ -1,9 +1,8 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
 
-class Action():
-    def __init__(self, src: Path, dest: Path|None = None):
-        self.src = src
+class Action(ABC):
+    def __init__(self, dest: Path|None = None):
         self.dest = dest
 
     @abstractmethod
