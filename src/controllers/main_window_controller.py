@@ -1,7 +1,8 @@
 from PyQt6.QtCore import Qt
+from concurrent.futures import ThreadPoolExecutor
 from .create_window_controller import CreateController
 from ..entities.entry import Entry
-from ..database.queries import db_call, get_selected_entry, delete_entry
+from ..database.queries import db_call, get_selected_entry, delete_entry, get_all_entries
 from ..models.main_window_model import TableModel
 from ..views.main_window import MainWindow
 from ..views.error_window import ErrorWindow
@@ -20,6 +21,7 @@ class MainController:
         self.view.delete_btn.clicked.connect(self.delete_selected_entry)
         self.view.edit_btn.clicked.connect(self.open_edit_window)
         self.view.start_btn.clicked.connect(self.start_selected_entry)
+        self.view.start_all_btn.clicked.connect(self.start_all_entries)
         self.view.script_table.doubleClicked.connect(self.open_edit_window)
 
     def open_create_window(self):
@@ -74,4 +76,18 @@ class MainController:
         
         row_id = self.model.get_row_id(index)
         start_entry(row_id)
-        
+
+    def start_all_entries(self):
+        result = db_call(get_all_entries)
+
+        if not result.get("success"):
+            ErrorWindow("Unable to get all entries").exec()
+            return
+
+        entries = result.get("data")
+
+        with ThreadPoolExecutor(max_workers=len(entries)) as executor:
+            executor.map(
+                lambda entry: start_entry(entry["id"]),
+                entries
+            )
