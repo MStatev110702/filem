@@ -16,10 +16,13 @@ def start_entry(entry_id: int):
         # Either the entry is inactive or it's already running
         if entry_result.get("data")["state"] != 1:
             return
+
+        entry = Entry.from_row(entry_result.get("data"))
         
-        next_run = datetime.strptime(entry_result.get("data")["next_run"], "%d.%m.%Y %H:%M:%S")
-        if next_run > datetime.now():
-            return
+        if entry.interval_type != "manually":
+            next_run = datetime.strptime(entry_result.get("data")["next_run"], "%d.%m.%Y %H:%M:%S")
+            if next_run > datetime.now():
+                return
         
         file_type_result = db_call(get_file_types, entry_id)
 
@@ -27,7 +30,6 @@ def start_entry(entry_id: int):
             raise Exception(f"Something went wrong while retrieving the file types:\n{file_type_result.get("error")}")
 
         file_types = [r[0] for r in file_type_result.get("data")]
-        entry = Entry.from_row(entry_result.get("data"))
 
         rule = RuleFactory().create(entry, file_types)
         file_rule = rule.file_rule
