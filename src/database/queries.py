@@ -101,6 +101,21 @@ def get_selected_entry(id: int, db: Database|None = None):
         db.execute(sql, (id,))
 
         return db.fetchone()
+
+def get_active_entries(db: Database|None = None) -> list:
+    db = get_db(db)
+
+    with db:
+        sql = """
+            SELECT id
+            FROM entries
+            WHERE STATE = 1 and INTERVAL_TYPE != 'manually'
+        """
+
+        db.execute(sql)
+
+        return db.fetchall()
+
     
 def get_file_types(id: int, db: Database|None = None) -> list:
     db = get_db(db)
