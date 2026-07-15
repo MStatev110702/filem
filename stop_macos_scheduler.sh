@@ -1,0 +1,1 @@
+launchctl bootout gui/$(id -u)/com.filemanager.job
