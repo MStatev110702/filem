@@ -251,8 +251,8 @@ class CreateController:
         else:
             user_platform = "universal"
             return False
-
-        if not is_abs:
+        
+        if not is_abs or Path(path).suffix:
             return False
         
         return is_valid_filepath(path, platform=user_platform)
