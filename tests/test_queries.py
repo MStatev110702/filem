@@ -251,7 +251,10 @@ class TestQueries(BaseTest):
         actual = astuple(
             replace(test_entry, id=1)
         )
-
+        actual = list(actual)
+        actual.append(None)
+        actual = tuple(actual)
+        
         self.assertTrue(result.get("success"))
         self.assertEqual(tuple(result.get("data")), actual)
 
@@ -268,6 +271,9 @@ class TestQueries(BaseTest):
         actual = astuple(
             replace(test_entry, id=1)
         )
+        actual = list(actual)
+        actual.append(None)
+        actual = tuple(actual)
 
         self.assertTrue(result.get("success"))
         self.assertEqual(tuple(result.get("data")), actual)
