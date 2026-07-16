@@ -96,11 +96,13 @@ class CreateController:
         if file_dialog.strip() == "":
             return
 
+        path = Path(file_dialog)
+
         button = v.sender()
         if button == v.origin_tool_btn:
-            v.origin_input.setText(file_dialog)
+            v.origin_input.setText(str(path))
         else:
-            v.dest_input.setText(file_dialog)
+            v.dest_input.setText(str(path))
 
     def add_type_to_list(self) -> None:
         value = self.view.files_combo.currentText().strip().lower().replace(" ", "")

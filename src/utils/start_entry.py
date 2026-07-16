@@ -1,5 +1,6 @@
 from pathlib import Path
 from datetime import datetime
+import platform
 from ..rules.rule_factory import RuleFactory
 from ..action.action_factory import FileActionFactory, DirActionFactory
 from ..entities.entry import Entry
@@ -41,6 +42,9 @@ def start_entry(entry_id: int):
         db_call(change_entry_state, entry_id, 2)
 
         for item in Path(entry.originpath).iterdir():
+            if platform.system() == "Windows" and item.name.lower() == "desktop.ini":
+                continue
+
             if file_rule and file_rule.match(item):
                 file_action.execute(item)
             elif dir_rule and dir_rule.match(item):
