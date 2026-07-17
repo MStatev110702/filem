@@ -1,2 +1,2 @@
-python -m scheduler.archlinux
+python -m scheduler.linux
 systemctl --user start filem.service
