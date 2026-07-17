@@ -10,7 +10,7 @@ def main():
 <plist version="1.0">
 <dict>
     <key>Label</key>
-    <string>com.filemanager.job</string>
+    <string>com.filem.job</string>
     <key>RunAtLoad</key>
     <true/>
     <key>ProgramArguments</key>
@@ -27,15 +27,15 @@ def main():
     <integer>60</integer>
 
     <key>StandardOutPath</key>
-    <string>/tmp/filemanager_job.log</string>
+    <string>/tmp/filem_job.log</string>
 
     <key>StandardErrorPath</key>
-    <string>/tmp/filemanager_job_error.log</string>
+    <string>/tmp/filem_job_error.log</string>
 
 </dict>
 </plist>"""
 
-    file_path = Path("~/Library/LaunchAgents/com.filemanager.job.plist").expanduser()
+    file_path = Path("~/Library/LaunchAgents/com.filem.job.plist").expanduser()
 
     file_path.write_text(file_input)
 

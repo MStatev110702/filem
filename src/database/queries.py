@@ -22,7 +22,7 @@ def db_call(fn, *args, **kwargs) -> QueryResponse:
         }
     
 def get_db(db: Database|None) -> Database:
-    return db or Database("filemanager.db")
+    return db or Database("filem.db")
 
 def create_entry(entry: Entry, next_run: datetime, db: Database|None = None) -> int:
     db = get_db(db)
