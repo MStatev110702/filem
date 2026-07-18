@@ -1,5 +1,4 @@
 from pathlib import Path
-import subprocess
 from .paths import PROJECT_DIR
 
 def main():
@@ -13,11 +12,10 @@ ExecStart="{str(PROJECT_DIR)}/.venv/bin/python" -m scripts.entry_job
 [Install]
 WantedBy=default.target"""
 
-    file_name = "filem.service"
     systemd_path = Path(f"~/.config/systemd/user").expanduser()
     systemd_path.parent.mkdir(parents=True, exist_ok=True)
 
-    (systemd_path / file_name).write_text(file_input)
+    (systemd_path / "filem.service").write_text(file_input)
 
     timer_input = """[Unit]
 Description=Run Filem job every minute
@@ -29,12 +27,7 @@ OnUnitActiveSec=60s
 [Install]
 WantedBy=timers.target"""
 
-    timer_name = "filem.timer"
-    (systemd_path / timer_name).write_text(timer_input)
-    
-    subprocess.run(["systemctl", "--user", "daemon-reload"])
-    subprocess.run(["systemctl", "--user", "enable", file_name])
-    subprocess.run(["systemctl", "--user", "enable", "--now", timer_name])
+    (systemd_path / "filem.timer").write_text(timer_input)
 
 if __name__ == "__main__":
     main()
