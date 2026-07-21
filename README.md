@@ -278,3 +278,9 @@ For example if you want to create an entry that should move all `png` and `jpg` 
 10. **File Type Filter**: `Selected Types`
 11. Add `png` and `jpg` to the file list
 12. Save the Entry
+
+## Contributing
+
+Contribute by forking the repo and opening pull requests. Please ensure that your code passes the existing tests, and write tests to test your changes if applicable.
+
+All pull requests should be submitted to the `main` branch.
