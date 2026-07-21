@@ -3,48 +3,53 @@ from datetime import datetime, timedelta
 from .paths import PROJECT_DIR
 
 def main():
-    python_exe = PROJECT_DIR / ".venv" / "Scripts" / "pythonw.exe"
+    try:
+        python_exe = PROJECT_DIR / ".venv" / "Scripts" / "pythonw.exe"
 
-    scheduler = client.Dispatch("Schedule.Service")
-    scheduler.Connect()
+        scheduler = client.Dispatch("Schedule.Service")
+        scheduler.Connect()
 
-    root_folder = scheduler.GetFolder("\\")
+        root_folder = scheduler.GetFolder("\\")
 
-    task = scheduler.NewTask(0)
+        task = scheduler.NewTask(0)
 
-    principal = task.Principal
-    principal.LogonType = 3 
-    principal.RunLevel = 0  
+        principal = task.Principal
+        principal.LogonType = 3 
+        principal.RunLevel = 0  
 
-    action = task.Actions.Create(0)
-    action.Path = str(python_exe)
-    action.Arguments = "-m scripts.entry_job"
-    action.WorkingDirectory = str(PROJECT_DIR)
+        action = task.Actions.Create(0)
+        action.Path = str(python_exe)
+        action.Arguments = "-m scripts.entry_job"
+        action.WorkingDirectory = str(PROJECT_DIR)
 
-    trigger = task.Triggers.Create(2)
+        trigger = task.Triggers.Create(2)
 
-    start = datetime.now() + timedelta(minutes=1)
+        start = datetime.now() + timedelta(minutes=1)
 
-    trigger.StartBoundary = start.strftime("%Y-%m-%dT%H:%M:%S")
+        trigger.StartBoundary = start.strftime("%Y-%m-%dT%H:%M:%S")
 
-    repetition = trigger.Repetition
-    repetition.Interval = "PT1M"
-    repetition.StopAtDurationEnd = False
+        repetition = trigger.Repetition
+        repetition.Interval = "PT1M"
+        repetition.StopAtDurationEnd = False
 
-    settings = task.Settings
-    settings.Enabled = True
-    settings.Hidden = False
-    settings.StartWhenAvailable = True
-    settings.ExecutionTimeLimit = "PT0S"
+        settings = task.Settings
+        settings.Enabled = True
+        settings.Hidden = False
+        settings.StartWhenAvailable = True
+        settings.ExecutionTimeLimit = "PT0S"
 
-    root_folder.RegisterTaskDefinition(
-        "Filem job",
-        task,
-        6,
-        None,
-        None,
-        3
-    )
+        root_folder.RegisterTaskDefinition(
+            "Filem job",
+            task,
+            6,
+            None,
+            None,
+            3
+        )
+        print("Task sucessfully created!")
+    except Exception as e:
+        raise Exception(f"Unexpected error while creating the task: {e}")
+
 
 if __name__ == "__main__":
     main()
