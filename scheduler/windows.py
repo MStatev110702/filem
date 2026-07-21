@@ -46,7 +46,7 @@ def main():
             None,
             3
         )
-        print("Task sucessfully created!")
+        print("Task successfully created!")
     except Exception as e:
         raise Exception(f"Unexpected error while creating the task: {e}")
 
