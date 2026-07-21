@@ -161,8 +161,11 @@ sh start_linux.sh
 You should get an output similar to this
 
 ```bash
-coming soon
+Created symlink '/home/username/.config/systemd/user/default.target.wants/filem.service' → '/home/username/.config/systemd/user/filem.service'.
+Created symlink '/home/username/.config/systemd/user/timers.target.wants/filem.timer' → '/home/username/.config/systemd/user/filem.timer'.
 ```
+
+With more detailed information below. Press Q when your done.
 
 2. This creates a `filem.service` and `filem.timer` file in `~/.config/systemd/user` (default interval is 60 seconds)
 3. If you want to change something please refer to the respective docs [systemd.servie](https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html) and [systermd.timer](https://www.freedesktop.org/software/systemd/man/latest/systemd.timer.htmla)
