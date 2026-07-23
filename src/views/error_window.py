@@ -1,4 +1,4 @@
-from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtWidgets
 
 class ErrorWindow(QtWidgets.QDialog):
     def __init__(self, text: str):

@@ -1,4 +1,4 @@
-from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QGridLayout, QHBoxLayout, QStackedLayout, QLabel, QLineEdit, QSizePolicy, QTextEdit, QComboBox, QSpinBox, QRadioButton, QButtonGroup, QTimeEdit, QTabWidget, QListView, QToolButton, QPushButton, QCheckBox
 from enum import Enum
 from ..models.create_window_model import TypeListModel
